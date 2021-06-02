@@ -2,8 +2,19 @@ cmake_minimum_required(VERSION 3.17)
 
 add_definitions(-DDEBUG)
 
+set(Puzzle_SOURCES
+        src/App.cpp
+)
+
+set(Puzzle_HEADERS
+        include/App.hpp
+)
+
 add_executable(${PROJECT_NAME}
         src/main.cpp
+        ${Puzzle_SOURCES}
+
+        ${Puzzle_HEADERS}
         )
 
 if (APPLE)
@@ -11,6 +22,14 @@ if (APPLE)
 elseif (WIN32)
     # none
 endif()
+
+target_include_directories(${PROJECT_NAME}
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+        PRIVATE
+        src
+        )
 
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
@@ -23,4 +42,8 @@ target_link_libraries(${PROJECT_NAME}
         Engine::View
         )
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/..")
+
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
+                          ${CMAKE_SOURCE_DIR}/game/assets $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets)
