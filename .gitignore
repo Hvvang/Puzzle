@@ -31,7 +31,11 @@
 *.out
 *.app
 
-cmake-build-debug
 .idea
-.DS_Store
+
+cmake-build-debug
+build
+assets
 Puzzle
+
+.DS_Store
