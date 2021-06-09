@@ -17,27 +17,24 @@ using ::Engine::Math::Vector2i;
 
 struct TileComponent : Component {
     TileComponent() {
-        entity = ::std::make_unique<Entity>(entityManager->createEntity());
+        instatnce = ::std::make_unique<Entity>(entityManager->createEntity());
 
-        auto &spriteComponent = entity->addComponent<Sprite>();
+        auto &spriteComponent = instatnce->addComponent<Sprite>();
         spriteComponent.setImage("square");
         spriteComponent.getColor() = color;
         spriteComponent.getTransform().scale = {TileX * 2.f / static_cast<float>(spriteComponent.getTileRect().size.x),
                                                 TileY * 2.f / static_cast<float>(spriteComponent.getTileRect().size.y)};
-        entity->activate();
+        instatnce->activate();
     }
 
-    void updateSpritePosition() {
-        auto &spriteComponent = entity->getComponent<Sprite>();
-        spriteComponent.getTransform().position = {3.f + (position.x) * (TileX + OffsetX),
-                                                   4.f + (position.y) * (TileY + OffsetY)};
-    }
+private:
+    bool active = true;
+
+    ::std::unique_ptr<Entity> instatnce{ nullptr };
 
     Vector2i position;
     Color color{0.f, 0.5f, 1.f, 1.f};
 
-    bool active = true;
-
-private:
-    ::std::unique_ptr<Entity> entity{ nullptr };
+    friend class TileController;
+    friend class PieceController;
 };

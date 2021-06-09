@@ -8,8 +8,13 @@
 using ::Engine::ECS::System;
 using ::Engine::ECS::Requires;
 
+class PieceController;
+class TileController;
+
 class BoardController : public System<Requires<BoardComponent>> {
 public:
+
+    BoardController(MiniKit::Engine::Context &context);
 
     void update(float deltaTime);
 
@@ -25,7 +30,12 @@ private:
 
     void checkLinesToClear();
     void clearLines();
-private:
-    ::std::vector<int> m_linesToClear;
 
+private:
+    ::std::shared_ptr<PieceController> m_pieceSystem{ nullptr };
+    ::std::shared_ptr<TileController> m_tileSystem{ nullptr };
+    ::std::unique_ptr<Entity> m_currentPiece{ nullptr };
+
+    ::std::vector<int> m_linesToClear;
+    Vector2i m_spawnLocation{4, 0};
 };

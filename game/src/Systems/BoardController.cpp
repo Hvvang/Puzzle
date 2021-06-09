@@ -1,5 +1,25 @@
 #include <Systems/BoardController.hpp>
 
+#include <Components/PieceComponent.hpp>
+
+#include <Systems/TileController.hpp>
+#include <Systems/PieceController.hpp>
+
+BoardController::BoardController(MiniKit::Engine::Context &context) {
+    m_tileSystem = ::std::make_shared<TileController>();
+    m_pieceSystem = ::std::make_shared<PieceController>(m_tileSystem);
+    context.GetWindow().AddResponder(*m_pieceSystem);
+
+    entityManager->addSystem(*m_tileSystem);
+    entityManager->addSystem(*m_pieceSystem);
+
+    m_currentPiece = ::std::make_unique<Entity>(entityManager->createEntity());
+    auto &piece = m_currentPiece->addComponent<PieceComponent>();
+
+    m_pieceSystem->spawnPiece(piece, PieceComponent::Shape::O, m_spawnLocation);
+    m_currentPiece->activate();
+}
+
 void BoardController::occupyPos(const Vector2i &pos, TileComponent *target) {
     auto entities = getEntities();
     for (auto &entity : entities) {
@@ -41,7 +61,7 @@ void BoardController::removeTilesInRow(int row) {
 }
 
 void BoardController::update(float deltaTime) {
-
+    m_pieceSystem->update(deltaTime);
 }
 
 void BoardController::checkLinesToClear() {
@@ -71,3 +91,5 @@ void BoardController::clearLines() {
     }
     m_linesToClear.clear();
 }
+
+

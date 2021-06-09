@@ -5,20 +5,21 @@
 #include <EntityManager.hpp>
 #include <SpriteLoader.hpp>
 
-#include <Systems/SpriteRenderingSystem.hpp>
 
 #include <Screen.hpp>
 
-#include <Systems/TetrominoController.hpp>
-#include <Components/PieceComponent.hpp>
 
-#include <Components/BoardComponent.hpp>
+
+namespace Engine::ECS {
+    class SpriteRenderingSystem;
+};
+class BoardController;
 
 using ::Engine::View::Screen;
 using ::Engine::ECS::EntityManager;
 using ::Engine::ECS::Entity;
-using ::Engine::ECS::SpriteRenderingSystem;
 using ::Engine::Loader::SpriteLoader;
+using ::Engine::ECS::SpriteRenderingSystem;
 
 class App final : public ::MiniKit::Engine::Application, public ::MiniKit::Platform::Responder {
 public:
@@ -37,11 +38,10 @@ private:
     ::std::unique_ptr<EntityManager> m_entityManager{nullptr};
 
     ::std::shared_ptr<SpriteRenderingSystem> m_renderingSystem{nullptr};
-    ::std::shared_ptr<TetrominoController> m_tetrominoSystem{nullptr};
+    ::std::shared_ptr<BoardController> m_boardSystem{nullptr};
 
 
     ::std::unique_ptr<Entity> m_playField{nullptr};
-    ::std::unique_ptr<Entity> m_tetromino{nullptr};
 };
 
 

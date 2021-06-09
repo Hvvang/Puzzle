@@ -23,7 +23,7 @@ struct BoardBlock {
     explicit BoardBlock(const Vector2i &pos) : location(pos) {}
 };
 
-class BoardComponent : Component {
+class BoardComponent : public Component {
 public:
     BoardComponent() {
         for (auto i = 0; i < ROWS; ++i) {

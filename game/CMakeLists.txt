@@ -8,6 +8,7 @@ set(Puzzle_SOURCES
         src/Systems/BoardController.cpp
         src/Systems/TileController.cpp
         src/Systems/PieceController.cpp
+
         )
 
 set(Puzzle_HEADERS
@@ -18,10 +19,11 @@ set(Puzzle_HEADERS
         include/Components/TileComponent.hpp
         include/Components/BoardComponent.hpp
 
-        include/Systems/TetrominoController.hpp
         include/Systems/BoardController.hpp
         include/Systems/PieceController.hpp
-        include/Systems/TileController.hpp)
+        include/Systems/TileController.hpp
+
+        )
 
 add_executable(${PROJECT_NAME}
         main.cpp
