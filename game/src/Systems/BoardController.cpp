@@ -1,22 +1,30 @@
 #include <Systems/BoardController.hpp>
 
 #include <Components/PieceComponent.hpp>
+#include <Components/PieceCollisionComponent.hpp>
 
 #include <Systems/TileController.hpp>
 #include <Systems/PieceController.hpp>
+#include <Systems/CollisionSystem.hpp>
 
 BoardController::BoardController(MiniKit::Engine::Context &context) {
     m_tileSystem = ::std::make_shared<TileController>();
     m_pieceSystem = ::std::make_shared<PieceController>(m_tileSystem);
+    m_collisionSystem = ::std::make_shared<CollisionSystem>(this, m_pieceSystem);
+
     context.GetWindow().AddResponder(*m_pieceSystem);
 
     entityManager->addSystem(*m_tileSystem);
     entityManager->addSystem(*m_pieceSystem);
+    entityManager->addSystem(*m_collisionSystem);
+
+    auto shape = PieceComponent::Shape::I;
 
     m_currentPiece = ::std::make_unique<Entity>(entityManager->createEntity());
     auto &piece = m_currentPiece->addComponent<PieceComponent>();
+    auto &collision = m_currentPiece->addComponent<PieceCollisionComponent>(shape);
 
-    m_pieceSystem->spawnPiece(piece, PieceComponent::Shape::O, m_spawnLocation);
+    m_pieceSystem->spawnPiece(piece, shape, m_spawnLocation);
     m_currentPiece->activate();
 }
 
@@ -62,6 +70,7 @@ void BoardController::removeTilesInRow(int row) {
 
 void BoardController::update(float deltaTime) {
     m_pieceSystem->update(deltaTime);
+    m_collisionSystem->update(deltaTime);
 }
 
 void BoardController::checkLinesToClear() {
@@ -91,5 +100,19 @@ void BoardController::clearLines() {
     }
     m_linesToClear.clear();
 }
+
+bool BoardController::isInBounds(const Vector2i &pos) {
+    return pos.x >= 0 && pos.x < COLS && pos.y < ROWS;
+}
+
+bool BoardController::isPosEmpty(const Vector2i &pos) {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &board = entity.getComponent<BoardComponent>();
+        return !board.m_grid[pos.x][pos.y]->isOccupied;
+    }
+    return true;
+}
+
 
 

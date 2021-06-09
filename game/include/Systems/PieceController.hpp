@@ -7,6 +7,7 @@ using ::Engine::ECS::System;
 using ::Engine::ECS::Requires;
 
 class TileController;
+class PieceComponent;
 
 class PieceController : public System<Requires<PieceComponent>>, public ::MiniKit::Platform::Responder {
 public:
@@ -16,8 +17,8 @@ public:
     void spawnPiece(PieceComponent &piece, PieceComponent::Shape shape, const Vector2i &spawnLocation);
 
     ::std::array<Vector2i, 4> getTilesPosition(const PieceComponent &piece);
-    bool canMovePiece(const PieceComponent &piece, const Vector2i &offset);
     void movePiece(PieceComponent &piece, const Vector2i &offset);
+    void rotatePiece(PieceComponent &piece, bool clockwise);
 
     void KeyDown(::MiniKit::Platform::Window &window, const ::MiniKit::Platform::KeyEvent &event) noexcept override;
     void KeyUp(::MiniKit::Platform::Window &window, const ::MiniKit::Platform::KeyEvent &event) noexcept override;

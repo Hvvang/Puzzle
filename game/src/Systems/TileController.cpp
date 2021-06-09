@@ -14,11 +14,6 @@ void TileController::update(float deltaTime) {
     }
 }
 
-bool TileController::canMove(const TileComponent &tile, const Vector2i &offset) {
-    // TODO: Fixme - Implement me
-    return false;
-}
-
 void TileController::move(TileComponent &tile, const Vector2i &offset) {
     updatePosition(tile, tile.position + offset);
 }
@@ -33,8 +28,8 @@ void TileController::updatePosition(TileComponent &tile, const Vector2i &pos) {
 void TileController::rotate(TileComponent &tile, const Vector2i &origin, bool clockwise) {
         Vector2i relativePos = tile.position - origin;
         IntRect rotMatrix = clockwise
-                            ? IntRect{ Vector2i{0, -1}, Vector2i{1, 0} }
-                            : IntRect{ Vector2i{0, 1}, Vector2i{-1, 0} };
+                            ? IntRect{ Vector2i{0, 1}, Vector2i{-1, 0} }
+                            : IntRect{ Vector2i{0, -1}, Vector2i{1, 0} };
         int newXPos = (rotMatrix.x * relativePos.x) + (rotMatrix.width * relativePos.y);
         int newYPos = (rotMatrix.y * relativePos.x) + (rotMatrix.height * relativePos.y);
         Vector2i newPos = {newXPos, newYPos};

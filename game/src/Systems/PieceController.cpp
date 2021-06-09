@@ -2,6 +2,8 @@
 
 #include <Systems/TileController.hpp>
 
+using ::Engine::Math::operator-;
+
 void PieceController::update(float deltaTime) {
     localTime += deltaTime;
     moveTime += deltaTime;
@@ -9,6 +11,7 @@ void PieceController::update(float deltaTime) {
     auto entities = getEntities();
     for (auto &entity : entities) {
         auto &pieceComponent = entity.getComponent<PieceComponent>();
+        pieceComponent.previousData = {pieceComponent.state, pieceComponent.rotationIndex};
 
         if (pieceComponent.state & PieceComponent::State::MoveLeft) {
             if (moveTime > 0.2f) {
@@ -26,6 +29,18 @@ void PieceController::update(float deltaTime) {
             if (moveTime > 0.2f) {
                 movePiece(pieceComponent, {0, 1});
                 moveTime = 0;
+            }
+        }
+        if (pieceComponent.state & PieceComponent::State::RotateLeft) {
+            if (moveTime > 0.2f) {
+                rotatePiece(pieceComponent, false);
+                moveTime = 0.f;
+            }
+        }
+        if (pieceComponent.state & PieceComponent::State::RotateRight) {
+            if (moveTime > 0.2f) {
+                rotatePiece(pieceComponent, true);
+                moveTime = 0.f;
             }
         }
 //        if (localTime >= pieceComponent.m_speed) {
@@ -85,16 +100,23 @@ void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape sh
     return positions;
 }
 
-bool PieceController::canMovePiece(const PieceComponent &piece, const Vector2i &offset) {
-    // TODO: Fix me - Implement me
-    return true;
+void PieceController::movePiece(PieceComponent &piece, const Vector2i &offset) {
+    for (auto i = 0u; i < 4; ++i) {
+        tileSystem->move(piece.tiles[i]->getComponent<TileComponent>(), offset);
+    }
 }
 
-void PieceController::movePiece(PieceComponent &piece, const Vector2i &offset) {
-    if (canMovePiece(piece, offset)) {
-        for (auto i = 0u; i < 4; ++i) {
-            tileSystem->move(piece.tiles[i]->getComponent<TileComponent>(), offset);
-        }
+int Mod(int x, int m) {
+    return (x % m + m) % m;
+}
+
+void PieceController::rotatePiece(PieceComponent &piece, bool clockwise) {
+    piece.rotationIndex += clockwise ? 1 : -1;
+    piece.rotationIndex = Mod(piece.rotationIndex, 4);
+
+    auto originPos = piece.tiles[0]->getComponent<TileComponent>().position;
+    for(int i = 0; i < 4; ++i) {
+        tileSystem->rotate(piece.tiles[i]->getComponent<TileComponent>(), originPos, clockwise);
     }
 }
 
@@ -155,6 +177,9 @@ void PieceController::KeyUp(MiniKit::Platform::Window &window, const MiniKit::Pl
 
     }
 
+
 }
+
+
 
 

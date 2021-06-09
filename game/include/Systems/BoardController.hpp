@@ -10,6 +10,7 @@ using ::Engine::ECS::Requires;
 
 class PieceController;
 class TileController;
+class CollisionSystem;
 
 class BoardController : public System<Requires<BoardComponent>> {
 public:
@@ -17,6 +18,10 @@ public:
     BoardController(MiniKit::Engine::Context &context);
 
     void update(float deltaTime);
+
+    bool isInBounds(const Vector2i &pos);
+
+    bool isPosEmpty(const Vector2i &pos);
 
 private:
 
@@ -31,9 +36,12 @@ private:
     void checkLinesToClear();
     void clearLines();
 
+
+
 private:
     ::std::shared_ptr<PieceController> m_pieceSystem{ nullptr };
     ::std::shared_ptr<TileController> m_tileSystem{ nullptr };
+    ::std::shared_ptr<CollisionSystem> m_collisionSystem{ nullptr };
     ::std::unique_ptr<Entity> m_currentPiece{ nullptr };
 
     ::std::vector<int> m_linesToClear;

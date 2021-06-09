@@ -2,10 +2,12 @@
 
 #include <EntityManager.hpp>
 #include <Components/Sprite.hpp>
+#include <Components/TileComponent.hpp>
+
 #include <array>
 #include <memory>
 
-#include <Components/TileComponent.hpp>
+class TileComponent;
 
 using ::Engine::ECS::Entity;
 using ::Engine::ECS::Component;
@@ -14,12 +16,14 @@ using ::Engine::Math::Vector2i;
 using ::Engine::Math::operator+=;
 using ::Engine::Math::operator+;
 
-#define TileX 42.7f
-#define TileY 34.f
-#define OffsetX 6.f
-#define OffsetY 6.f
+//#define TileX 43.7f
+//#define TileY 34.f
+//#define OffsetX 6.f
+//#define OffsetY 6.f
 
 struct PieceComponent : Component {
+
+
     enum class Shape : uint8_t {
         I, O, J, L, T, Z, S
     } shape;
@@ -29,10 +33,15 @@ struct PieceComponent : Component {
         MoveRight = 0x2,
         MoveDown = 0x4,
         SoftDownMove = 0x8,
-        HardDownMove = 0x16,
-        RotateLeft = 0x32,
-        RotateRight = 0x64
+        HardDownMove = 0x10,
+        RotateLeft = 0x20,
+        RotateRight = 0x40,
     } state;
+
+    struct Data {
+        State state;
+        int rotationIndex;
+    } previousData;
 
     PieceComponent() : state(State::MoveDown) {
         for (auto &tile : tiles) {
@@ -44,8 +53,9 @@ struct PieceComponent : Component {
 private:
     ::std::array<::std::unique_ptr<Entity>, 4> tiles{ nullptr };
 
-    int rotationIndex;
+    int rotationIndex{0};
     float m_speed = 0.6f;
 
     friend class PieceController;
+    friend class CollisionSystem;
 };

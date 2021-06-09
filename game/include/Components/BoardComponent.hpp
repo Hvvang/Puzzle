@@ -33,13 +33,7 @@ public:
         }
     }
 
-    bool isInBounds(const Vector2i &pos) {
-        return pos.x >= 0 && pos.x < COLS && pos.y >= 0 && pos.y < ROWS;
-    }
 
-    bool isPosEmpty(const Vector2i &pos) {
-        return m_grid[pos.x][pos.y]->isOccupied;
-    }
 
 private:
     ::std::array<::std::array<::std::unique_ptr<BoardBlock>, COLS>, ROWS> m_grid{ nullptr };
