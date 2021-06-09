@@ -4,14 +4,27 @@ add_definitions(-DDEBUG)
 
 set(Puzzle_SOURCES
         src/App.cpp
-)
+
+        src/Systems/BoardController.cpp
+        src/Systems/TileController.cpp
+        src/Systems/PieceController.cpp
+        )
 
 set(Puzzle_HEADERS
         include/App.hpp
-)
+
+        include/Components/PieceComponent.hpp
+
+        include/Components/TileComponent.hpp
+        include/Components/BoardComponent.hpp
+
+        include/Systems/TetrominoController.hpp
+        include/Systems/BoardController.hpp
+        include/Systems/PieceController.hpp
+        include/Systems/TileController.hpp)
 
 add_executable(${PROJECT_NAME}
-        src/main.cpp
+        main.cpp
         ${Puzzle_SOURCES}
 
         ${Puzzle_HEADERS}
