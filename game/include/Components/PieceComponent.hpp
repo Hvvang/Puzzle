@@ -22,34 +22,15 @@ struct PieceComponent : Component {
         I, O, J, L, T, Z, S
     } shape;
 
-    enum State : uint8_t {
-        MoveLeft = 0x1,
-        MoveRight = 0x2,
-        MoveDown = 0x4,
-        SoftDownMove = 0x8,
-        HardDownMove = 0x10,
-        RotateLeft = 0x20,
-        RotateRight = 0x40,
-    } state;
-
-    struct Data {
-        State state;
-        int rotationIndex;
-    } previousData;
-
-    PieceComponent() : state(State::MoveDown) {
+    PieceComponent() {
         for (auto &tile : tiles) {
             tile = ::std::make_unique<Entity>(entityManager->createEntity());
             tile->addComponent<TileComponent>();
         }
     }
 
-
 private:
     ::std::array<::std::unique_ptr<Entity>, 4> tiles{ nullptr };
-
-    int rotationIndex{0};
-    float m_speed = 0.6f;
 
     friend class PieceController;
     friend class CollisionSystem;

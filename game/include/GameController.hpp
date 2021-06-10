@@ -36,14 +36,20 @@ public:
 
 private:
     void initPlayFieldBackground();
-    void spawnPiece(BlockSetEvent *event = nullptr);
+    void updatePieces(BlockSetEvent *event = nullptr);
+    void spawnPiece();
+    void updateNextPiece();
 
 private:
+    float _currentTime = 0.f;
+
     ::std::unique_ptr<EventSystem> m_eventSystem{ nullptr };
     ::std::unique_ptr<Entity> m_playField{ nullptr };
 
     Entity m_currentPiece;
     ::std::unique_ptr<Entity> m_nextPiece{ nullptr };
+
+    ::std::unique_ptr<Entity> m_levelUp{ nullptr };
 
     ::std::shared_ptr<SpriteRenderingSystem> m_renderingSystem{ nullptr };
     ::std::shared_ptr<GridController> m_gridSystem{nullptr };
@@ -55,4 +61,6 @@ private:
     friend class CollisionSystem;
     friend class PieceController;
     friend class TileController;
+
+
 };

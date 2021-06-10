@@ -4,6 +4,8 @@
 
 #include <GameController.hpp>
 
+#include <Components/MoveComponent.hpp>
+
 using ::Engine::Math::operator-;
 
 void PieceController::update(float deltaTime) {
@@ -13,84 +15,86 @@ void PieceController::update(float deltaTime) {
     auto entities = getEntities();
     for (auto &entity : entities) {
         auto &pieceComponent = entity.getComponent<PieceComponent>();
-        pieceComponent.previousData = {pieceComponent.state, pieceComponent.rotationIndex};
+        auto &moveComponent = entity.getComponent<MoveComponent>();
 
-        if (pieceComponent.state & PieceComponent::State::MoveLeft) {
+        moveComponent.previousData = {moveComponent.state, moveComponent.rotationIndex};
+
+        if (moveComponent.state & MoveComponent::State::MoveLeft) {
             if (moveTime > 0.2f) {
                 movePiece(pieceComponent, {-1, 0});
                 moveTime = 0;
             }
         }
-        if (pieceComponent.state & PieceComponent::State::MoveRight) {
+        if (moveComponent.state & MoveComponent::State::MoveRight) {
             if (moveTime > 0.2f) {
                 movePiece(pieceComponent, {1, 0});
                 moveTime = 0;
             }
         }
-        if (pieceComponent.state & PieceComponent::State::SoftDownMove) {
+        if (moveComponent.state & MoveComponent::State::SoftDownMove) {
             if (moveTime > 0.2f) {
                 movePiece(pieceComponent, {0, 1});
                 moveTime = 0;
             }
         }
-        if (pieceComponent.state & PieceComponent::State::RotateLeft) {
+        if (moveComponent.state & MoveComponent::State::RotateLeft) {
             if (moveTime > 0.2f) {
-                rotatePiece(pieceComponent, false);
+                rotatePiece(pieceComponent, moveComponent, false);
                 moveTime = 0.f;
             }
         }
-        if (pieceComponent.state & PieceComponent::State::RotateRight) {
+        if (moveComponent.state & MoveComponent::State::RotateRight) {
             if (moveTime > 0.2f) {
-                rotatePiece(pieceComponent, true);
+                rotatePiece(pieceComponent, moveComponent, true);
                 moveTime = 0.f;
             }
         }
-        if (localTime >= pieceComponent.m_speed) {
+        if (localTime >= moveComponent.m_speed) {
             movePiece(pieceComponent, {0, 1});
             localTime = 0.f;
         }
     }
 }
 
-void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape shape, const Vector2i &spawnLocation) {
+void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape shape, const Vector2i &spawnLocation, const Vector2f &boardOffset) {
     auto &tileSystem = m_parent->m_tileSystem;
     piece.shape = shape;
-    tileSystem->updatePosition(piece.tiles[0]->getComponent<TileComponent>(), spawnLocation);
+    tileSystem->updatePosition(piece.tiles[0]->getComponent<TileComponent>(), spawnLocation, boardOffset);
     switch (piece.shape) {
         case PieceComponent::Shape::I:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0});
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{2, 0});
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0});
+            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{2, 0}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
             break;
         case PieceComponent::Shape::O:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0});
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, -1});
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1});
+            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, -1}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1}, boardOffset);
             break;
         case PieceComponent::Shape::J:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0});
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, -1});
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0});
+            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, -1}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
             break;
         case PieceComponent::Shape::L:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0});
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, -1});
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0});
+            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, -1}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
             break;
         case PieceComponent::Shape::T:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0});
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1});
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0});
+            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
             break;
         case PieceComponent::Shape::Z:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1});
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, -1});
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0});
+            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, -1}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
             break;
         case PieceComponent::Shape::S:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0});
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, -1});
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1});
+            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, -1}, boardOffset);
+            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1}, boardOffset);
             break;
     }
 }
@@ -113,9 +117,10 @@ int Mod(int x, int m) {
     return (x % m + m) % m;
 }
 
-void PieceController::rotatePiece(PieceComponent &piece, bool clockwise) {
-    piece.rotationIndex += clockwise ? 1 : -1;
-    piece.rotationIndex = Mod(piece.rotationIndex, 4);
+void PieceController::rotatePiece(PieceComponent &piece, MoveComponent &move, bool clockwise) {
+
+    move.rotationIndex += clockwise ? 1 : -1;
+    move.rotationIndex = Mod(move.rotationIndex, 4);
 
     auto originPos = piece.tiles[0]->getComponent<TileComponent>().position;
     for(int i = 0; i < 4; ++i) {
@@ -126,57 +131,57 @@ void PieceController::rotatePiece(PieceComponent &piece, bool clockwise) {
 void PieceController::KeyDown(MiniKit::Platform::Window &window, const MiniKit::Platform::KeyEvent &event) noexcept {
     auto entities = getEntities();
     for (auto &entity : entities) {
-        auto &pieceComponent = entity.getComponent<PieceComponent>();
+        auto &moveComponent = entity.getComponent<MoveComponent>();
 
-        uint8_t state = static_cast<uint8_t>(pieceComponent.state);
+        uint8_t state = static_cast<uint8_t>(moveComponent.state);
 
         if (event.keycode == MiniKit::Platform::Keycode::KeyLeft) {
-            state |= static_cast<uint8_t>(PieceComponent::State::MoveLeft);
+            state |= static_cast<uint8_t>(MoveComponent::State::MoveLeft);
         }
         if (event.keycode == MiniKit::Platform::Keycode::KeyRight) {
-            state |= static_cast<uint8_t>(PieceComponent::State::MoveRight);
+            state |= static_cast<uint8_t>(MoveComponent::State::MoveRight);
         }
         if (event.keycode == MiniKit::Platform::Keycode::KeyDown) {
-            state |= static_cast<uint8_t>(PieceComponent::State::SoftDownMove);
+            state |= static_cast<uint8_t>(MoveComponent::State::SoftDownMove);
         }
         if (event.keycode == MiniKit::Platform::Keycode::KeySpace) {
-            state |= static_cast<uint8_t>(PieceComponent::State::HardDownMove);
+            state |= static_cast<uint8_t>(MoveComponent::State::HardDownMove);
         }
         if (event.keycode == MiniKit::Platform::Keycode::KeyX) {
-            state |= static_cast<uint8_t>(PieceComponent::State::RotateRight);
+            state |= static_cast<uint8_t>(MoveComponent::State::RotateRight);
         }
         if (event.keycode == MiniKit::Platform::Keycode::KeyZ) {
-            state |= static_cast<uint8_t>(PieceComponent::State::RotateLeft);
+            state |= static_cast<uint8_t>(MoveComponent::State::RotateLeft);
         }
-        pieceComponent.state = static_cast<PieceComponent::State>(state);
+        moveComponent.state = static_cast<MoveComponent::State>(state);
     }
 }
 
 void PieceController::KeyUp(MiniKit::Platform::Window &window, const MiniKit::Platform::KeyEvent &event) noexcept {
     auto entities = getEntities();
     for (auto &entity : entities) {
-        auto &pieceComponent = entity.getComponent<PieceComponent>();
-        uint8_t state = static_cast<uint8_t>(pieceComponent.state);
+        auto &moveComponent = entity.getComponent<MoveComponent>();
+        uint8_t state = static_cast<uint8_t>(moveComponent.state);
 
         if (event.keycode == MiniKit::Platform::Keycode::KeyLeft) {
-            state &= ~static_cast<uint8_t>(PieceComponent::State::MoveLeft);
+            state &= ~static_cast<uint8_t>(MoveComponent::State::MoveLeft);
         }
         if (event.keycode == MiniKit::Platform::Keycode::KeyRight) {
-            state &= ~static_cast<uint8_t>(PieceComponent::State::MoveRight);
+            state &= ~static_cast<uint8_t>(MoveComponent::State::MoveRight);
         }
         if (event.keycode == MiniKit::Platform::Keycode::KeyDown) {
-            state &= ~static_cast<uint8_t>(PieceComponent::State::SoftDownMove);
+            state &= ~static_cast<uint8_t>(MoveComponent::State::SoftDownMove);
         }
         if (event.keycode == MiniKit::Platform::Keycode::KeySpace) {
-            state &= ~static_cast<uint8_t>(PieceComponent::State::HardDownMove);
+            state &= ~static_cast<uint8_t>(MoveComponent::State::HardDownMove);
         }
         if (event.keycode == MiniKit::Platform::Keycode::KeyX) {
-            state &= ~static_cast<uint8_t>(PieceComponent::State::RotateRight);
+            state &= ~static_cast<uint8_t>(MoveComponent::State::RotateRight);
         }
         if (event.keycode == MiniKit::Platform::Keycode::KeyZ) {
-            state &= ~static_cast<uint8_t>(PieceComponent::State::RotateLeft);
+            state &= ~static_cast<uint8_t>(MoveComponent::State::RotateLeft);
         }
-        pieceComponent.state = static_cast<PieceComponent::State>(state);
+        moveComponent.state = static_cast<MoveComponent::State>(state);
 
     }
 

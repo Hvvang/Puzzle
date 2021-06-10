@@ -37,7 +37,7 @@ set(Puzzle_HEADERS
         include/GameController.hpp
 
 
-        include/GameEvents.hpp)
+        include/GameEvents.hpp include/Components/MoveComponent.hpp)
 
 
 add_executable(${PROJECT_NAME}
