@@ -39,25 +39,6 @@ struct PieceCollisionComponent : Component {
             offsetMatrix[0][1] = {0, 1};
             offsetMatrix[0][2] = {-1, 1};
             offsetMatrix[0][3] = {-1, 0};
-            offsetMatrix[1][0] = {-1, 0};
-            offsetMatrix[1][1] = {0, 0};
-            offsetMatrix[1][2] = {1, -1};
-            offsetMatrix[1][3] = {0, -1};
-
-            offsetMatrix[2][0] = {2, 0};
-            offsetMatrix[2][1] = {0, 0};
-            offsetMatrix[2][2] = {-2, -1};
-            offsetMatrix[2][3] = {0, -1};
-
-            offsetMatrix[3][0] = {-1, 0};
-            offsetMatrix[3][1] = {0, -1};
-            offsetMatrix[3][2] = {1, 0};
-            offsetMatrix[3][3] = {0, 1};
-
-            offsetMatrix[4][0] = {2, 0};
-            offsetMatrix[4][1] = {0, 2};
-            offsetMatrix[4][2] = {-2, 0};
-            offsetMatrix[4][3] = {0, -2};
         } else {
             offsetMatrix[0][0] = {0, 0};
             offsetMatrix[0][1] = {0, 0};

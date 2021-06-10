@@ -21,7 +21,7 @@ void TileController::move(TileComponent &tile, const Vector2i &offset) {
 void TileController::updatePosition(TileComponent &tile, const Vector2i &pos) {
     tile.position = pos;
     auto &spriteComponent = tile.instatnce->getComponent<Sprite>();
-    spriteComponent.getTransform().position = {3.f + (pos.x) * (TileX + OffsetX),
+    spriteComponent.getTransform().position = {5.f + (pos.x) * (TileX + OffsetX),
                                                4.f + (pos.y) * (TileY + OffsetY)};
 }
 

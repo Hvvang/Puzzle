@@ -7,6 +7,7 @@
 #include <Systems/PieceController.hpp>
 #include <Systems/CollisionSystem.hpp>
 
+
 BoardController::BoardController(MiniKit::Engine::Context &context) {
     m_tileSystem = ::std::make_shared<TileController>();
     m_pieceSystem = ::std::make_shared<PieceController>(m_tileSystem);
@@ -18,7 +19,7 @@ BoardController::BoardController(MiniKit::Engine::Context &context) {
     entityManager->addSystem(*m_pieceSystem);
     entityManager->addSystem(*m_collisionSystem);
 
-    auto shape = PieceComponent::Shape::I;
+    auto shape = PieceComponent::Shape::L;
 
     m_currentPiece = ::std::make_unique<Entity>(entityManager->createEntity());
     auto &piece = m_currentPiece->addComponent<PieceComponent>();
@@ -29,23 +30,26 @@ BoardController::BoardController(MiniKit::Engine::Context &context) {
 }
 
 void BoardController::occupyPos(const Vector2i &pos, TileComponent *target) {
-    auto entities = getEntities();
-    for (auto &entity : entities) {
-        auto &board = entity.getComponent<BoardComponent>();
+    if (pos.y >= 0) {
+        auto entities = getEntities();
+        for (auto &entity : entities) {
+            auto &board = entity.getComponent<BoardComponent>();
 
-        board.m_grid[pos.x][pos.y]->isOccupied = true;
-        board.m_grid[pos.x][pos.y]->tile = target;
+            board.m_grid[pos.x][pos.y]->isOccupied = true;
+            board.m_grid[pos.x][pos.y]->tile = target;
+        }
     }
-
 }
 
 void BoardController::deOccupyPos(const Vector2i &pos) {
-    auto entities = getEntities();
-    for (auto &entity : entities) {
-        auto &board = entity.getComponent<BoardComponent>();
+    if (pos.y >= 0) {
+        auto entities = getEntities();
+        for (auto &entity : entities) {
+            auto &board = entity.getComponent<BoardComponent>();
 
-        board.m_grid[pos.x][pos.y]->isOccupied = false;
-        board.m_grid[pos.x][pos.y]->tile = nullptr;
+            board.m_grid[pos.x][pos.y]->isOccupied = false;
+            board.m_grid[pos.x][pos.y]->tile = nullptr;
+        }
     }
 }
 

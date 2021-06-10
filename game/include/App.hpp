@@ -31,15 +31,12 @@ public:
 
 
 private:
-    float m_globalTime = 0.f;
-
     ::std::unique_ptr<Screen> m_screen{nullptr};
     ::std::unique_ptr<SpriteLoader> m_spriteManager{nullptr};
     ::std::unique_ptr<EntityManager> m_entityManager{nullptr};
 
     ::std::shared_ptr<SpriteRenderingSystem> m_renderingSystem{nullptr};
     ::std::shared_ptr<BoardController> m_boardSystem{nullptr};
-
 
     ::std::unique_ptr<Entity> m_playField{nullptr};
 };

@@ -43,10 +43,10 @@ void PieceController::update(float deltaTime) {
                 moveTime = 0.f;
             }
         }
-//        if (localTime >= pieceComponent.m_speed) {
-//            movePiece(pieceComponent, {0, 1});
-//            localTime = 0.f;
-//        }
+        if (localTime >= pieceComponent.m_speed) {
+            movePiece(pieceComponent, {0, 1});
+            localTime = 0.f;
+        }
     }
 }
 

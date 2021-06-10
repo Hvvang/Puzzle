@@ -19,7 +19,7 @@ using ::Engine::ECS::Sprite;
     m_spriteManager = ::std::make_unique<SpriteLoader>(context);
 
     {
-        m_spriteManager->loadSprite("assets/images/background_g.png", "playField");
+        m_spriteManager->loadSprite("assets/images/background_b.png", "playField");
         m_spriteManager->loadSprite("assets/images/square.png", "square");
     }
 
@@ -50,8 +50,6 @@ using ::Engine::ECS::Sprite;
 
 void App::Tick(MiniKit::Engine::Context &context) noexcept {
     m_entityManager->refresh();
-
-    m_globalTime += context.GetFrameDelta();
 
     m_boardSystem->update(context.GetFrameDelta());
 

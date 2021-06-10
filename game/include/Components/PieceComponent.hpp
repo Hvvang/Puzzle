@@ -16,13 +16,7 @@ using ::Engine::Math::Vector2i;
 using ::Engine::Math::operator+=;
 using ::Engine::Math::operator+;
 
-//#define TileX 43.7f
-//#define TileY 34.f
-//#define OffsetX 6.f
-//#define OffsetY 6.f
-
 struct PieceComponent : Component {
-
 
     enum class Shape : uint8_t {
         I, O, J, L, T, Z, S
@@ -50,6 +44,7 @@ struct PieceComponent : Component {
         }
     }
 
+
 private:
     ::std::array<::std::unique_ptr<Entity>, 4> tiles{ nullptr };
 
@@ -58,4 +53,5 @@ private:
 
     friend class PieceController;
     friend class CollisionSystem;
+    friend class BoardController;
 };

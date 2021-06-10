@@ -10,8 +10,8 @@ using ::Engine::ECS::Component;
 using ::Engine::ECS::Sprite;
 using ::Engine::Math::Vector2i;
 
-#define TileX 42.7f
-#define TileY 34.f
+#define TileX 42.4f
+#define TileY 33.85f
 #define OffsetX 6.f
 #define OffsetY 6.f
 
@@ -33,7 +33,7 @@ private:
     ::std::unique_ptr<Entity> instatnce{ nullptr };
 
     Vector2i position;
-    Color color{0.f, 0.5f, 1.f, 1.f};
+    Color color{0.f, 0.f, 0.f, 1.0f};
 
     friend class TileController;
     friend class PieceController;

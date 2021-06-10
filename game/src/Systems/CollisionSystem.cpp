@@ -25,20 +25,22 @@ void CollisionSystem::update(float) {
                 m_pieceSystem->movePiece(piece, endOffset);
             }
         }
-        else if (!checkMovePiece(m_pieceSystem->getTilesPosition(piece), {0, 0})) {
-            if (piece.state & PieceComponent::State::MoveRight
-                || piece.state & PieceComponent::State::MoveLeft) {
-                bool isRightMove = (piece.state & PieceComponent::State::MoveRight);
-                bool isLeftMove = (piece.state & PieceComponent::State::MoveLeft);
-                auto backOffset = Vector2i{-isRightMove + isLeftMove, 0};
+        if (!checkMovePiece(m_pieceSystem->getTilesPosition(piece), {0, 0})
+            && (piece.state & PieceComponent::State::MoveRight
+            || piece.state & PieceComponent::State::MoveLeft)) {
+            bool isRightMove = (piece.state & PieceComponent::State::MoveRight);
+            bool isLeftMove = (piece.state & PieceComponent::State::MoveLeft);
+            auto backOffset = Vector2i{-isRightMove + isLeftMove, 0};
 
-                m_pieceSystem->movePiece(piece, backOffset);
-            }
-            else if (piece.state & PieceComponent::State::MoveDown
-                || piece.state & PieceComponent::State::SoftDownMove) {
-                m_pieceSystem->movePiece(piece, {0, -1});
-            }
+            m_pieceSystem->movePiece(piece, backOffset);
         }
+        if (!checkMovePiece(m_pieceSystem->getTilesPosition(piece), {0, 0})
+            && (piece.state & PieceComponent::State::MoveDown
+            || piece.state & PieceComponent::State::SoftDownMove)) {
+            m_pieceSystem->movePiece(piece, {0, -1});
+
+        }
+
     }
 }
 
