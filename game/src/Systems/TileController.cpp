@@ -1,5 +1,7 @@
 #include <Systems/TileController.hpp>
 
+#include <Components/TileComponent.hpp>
+
 using ::Engine::Math::operator+=;
 using ::Engine::Math::operator-;
 using ::Engine::Math::operator+;
@@ -20,7 +22,7 @@ void TileController::move(TileComponent &tile, const Vector2i &offset) {
 
 void TileController::updatePosition(TileComponent &tile, const Vector2i &pos) {
     tile.position = pos;
-    auto &spriteComponent = tile.instatnce->getComponent<Sprite>();
+    auto &spriteComponent = tile.instance->getComponent<Sprite>();
     spriteComponent.getTransform().position = {5.f + (pos.x) * (TileX + OffsetX),
                                                4.f + (pos.y) * (TileY + OffsetY)};
 }

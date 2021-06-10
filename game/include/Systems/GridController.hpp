@@ -1,21 +1,17 @@
 #pragma once
 
-
 #include <EntityComponentSystem.hpp>
 #include <Components/BoardComponent.hpp>
-
+#include <GameEvents.hpp>
 
 using ::Engine::ECS::System;
 using ::Engine::ECS::Requires;
 
-class PieceController;
-class TileController;
-class CollisionSystem;
+class GameController;
 
-class BoardController : public System<Requires<BoardComponent>> {
+class GridController : public System<Requires<BoardComponent>> {
 public:
-
-    BoardController(MiniKit::Engine::Context &context);
+    explicit GridController(GameController *parent = nullptr);
 
     void update(float deltaTime);
 
@@ -34,17 +30,15 @@ private:
     void removeTilesInRow(int row);
 
     void checkLinesToClear();
+
     void clearLines();
 
-
+    void onBlockSetEvent(BlockSetEvent *blockSetEvent);
 
 private:
-    ::std::shared_ptr<PieceController> m_pieceSystem{ nullptr };
-    ::std::shared_ptr<TileController> m_tileSystem{ nullptr };
-    ::std::shared_ptr<CollisionSystem> m_collisionSystem{ nullptr };
-    ::std::unique_ptr<Entity> m_currentPiece{ nullptr };
-
+    GameController *m_parent{ nullptr };
     ::std::vector<int> m_linesToClear;
     Vector2i m_spawnLocation{4, 0};
 
+    friend class GameController;
 };

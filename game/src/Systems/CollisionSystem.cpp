@@ -1,12 +1,14 @@
 #include "Systems/CollisionSystem.hpp"
-#include "Systems/PieceController.hpp"
-#include "Systems/BoardController.hpp"
+#include <Systems/PieceController.hpp>
+#include <Systems/GridController.hpp>
 
 #include <Components/PieceCollisionComponent.hpp>
-#include <Components/PieceComponent.hpp>
+
+#include <GameController.hpp>
+
+#include <GameEvents.hpp>
 
 using ::Engine::Math::operator-;
-
 
 void CollisionSystem::update(float) {
     auto colliders = getEntities();
@@ -20,25 +22,26 @@ void CollisionSystem::update(float) {
             bool clockwise = piece.state & PieceComponent::State::RotateRight;
 
             if (!checkOffset(piece, collision, piece.previousData.rotationIndex, piece.rotationIndex, endOffset)) {
-                m_pieceSystem->rotatePiece(piece, !clockwise);
+                m_parent->m_pieceSystem->rotatePiece(piece, !clockwise);
             } else {
-                m_pieceSystem->movePiece(piece, endOffset);
+                m_parent->m_pieceSystem->movePiece(piece, endOffset);
             }
         }
-        if (!checkMovePiece(m_pieceSystem->getTilesPosition(piece), {0, 0})
+        if (!checkMovePiece(m_parent->m_pieceSystem->getTilesPosition(piece), {0, 0})
             && (piece.state & PieceComponent::State::MoveRight
             || piece.state & PieceComponent::State::MoveLeft)) {
             bool isRightMove = (piece.state & PieceComponent::State::MoveRight);
             bool isLeftMove = (piece.state & PieceComponent::State::MoveLeft);
             auto backOffset = Vector2i{-isRightMove + isLeftMove, 0};
 
-            m_pieceSystem->movePiece(piece, backOffset);
+            m_parent->m_pieceSystem->movePiece(piece, backOffset);
         }
-        if (!checkMovePiece(m_pieceSystem->getTilesPosition(piece), {0, 0})
+        if (!checkMovePiece(m_parent->m_pieceSystem->getTilesPosition(piece), {0, 0})
             && (piece.state & PieceComponent::State::MoveDown
             || piece.state & PieceComponent::State::SoftDownMove)) {
-            m_pieceSystem->movePiece(piece, {0, -1});
+            m_parent->m_pieceSystem->movePiece(piece, {0, -1});
 
+            m_parent->m_eventSystem->emit(new BlockSetEvent());
         }
 
     }
@@ -53,7 +56,7 @@ bool CollisionSystem::checkOffset(const PieceComponent &piece, const PieceCollis
         offsetVal2 = collision.offsetMatrix[testIndex][newRotIndex];
         endOffset = offsetVal1 - offsetVal2;
 
-        if (checkMovePiece(m_pieceSystem->getTilesPosition(piece), endOffset)) {
+        if (checkMovePiece(m_parent->m_pieceSystem->getTilesPosition(piece), endOffset)) {
             return true;
         }
     }
@@ -61,10 +64,11 @@ bool CollisionSystem::checkOffset(const PieceComponent &piece, const PieceCollis
 }
 
 bool CollisionSystem::checkMovePiece(const ::std::array<Vector2i, 4> &positions, const Vector2i &offset) {
+
     for (auto &pos : positions) {
         auto resPos = pos + offset;
 
-        if (!m_boardSystem->isInBounds(resPos) || !m_boardSystem->isPosEmpty(resPos)) {
+        if (!m_parent->m_gridSystem->isInBounds(resPos) || !m_parent->m_gridSystem->isPosEmpty(resPos)) {
             return false;
         }
     }

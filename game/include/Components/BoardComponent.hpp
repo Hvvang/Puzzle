@@ -7,7 +7,7 @@
 
 #include <Components/TileComponent.hpp>
 
-class BoardController;
+class GridController;
 
 using ::Engine::ECS::Component;
 using ::Engine::Math::FloatRect;
@@ -34,10 +34,9 @@ public:
     }
 
 
-
 private:
     ::std::array<::std::array<::std::unique_ptr<BoardBlock>, COLS>, ROWS> m_grid{ nullptr };
 
-    friend class BoardController;
+    friend class GridController;
 };
 

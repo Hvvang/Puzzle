@@ -7,10 +7,6 @@
 #include <Event/BaseHandlerFunction.hpp>
 #include <Event/HandlerFunction.hpp>
 
-//class BaseHandlerFunction;
-//template<class T, class EventType>
-//class HandlerFunction;
-
 typedef std::list<BaseHandlerFunction*> HandlerList;
 class EventSystem {
 public:

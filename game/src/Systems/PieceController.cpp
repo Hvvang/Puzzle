@@ -2,6 +2,8 @@
 
 #include <Systems/TileController.hpp>
 
+#include <GameController.hpp>
+
 using ::Engine::Math::operator-;
 
 void PieceController::update(float deltaTime) {
@@ -51,6 +53,7 @@ void PieceController::update(float deltaTime) {
 }
 
 void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape shape, const Vector2i &spawnLocation) {
+    auto &tileSystem = m_parent->m_tileSystem;
     piece.shape = shape;
     tileSystem->updatePosition(piece.tiles[0]->getComponent<TileComponent>(), spawnLocation);
     switch (piece.shape) {
@@ -102,7 +105,7 @@ void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape sh
 
 void PieceController::movePiece(PieceComponent &piece, const Vector2i &offset) {
     for (auto i = 0u; i < 4; ++i) {
-        tileSystem->move(piece.tiles[i]->getComponent<TileComponent>(), offset);
+        m_parent->m_tileSystem->move(piece.tiles[i]->getComponent<TileComponent>(), offset);
     }
 }
 
@@ -116,7 +119,7 @@ void PieceController::rotatePiece(PieceComponent &piece, bool clockwise) {
 
     auto originPos = piece.tiles[0]->getComponent<TileComponent>().position;
     for(int i = 0; i < 4; ++i) {
-        tileSystem->rotate(piece.tiles[i]->getComponent<TileComponent>(), originPos, clockwise);
+        m_parent->m_tileSystem->rotate(piece.tiles[i]->getComponent<TileComponent>(), originPos, clockwise);
     }
 }
 

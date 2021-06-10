@@ -5,10 +5,13 @@ add_definitions(-DDEBUG)
 set(Puzzle_SOURCES
         src/App.cpp
 
-        src/Systems/BoardController.cpp
+        src/Systems/GridController.cpp
         src/Systems/TileController.cpp
         src/Systems/PieceController.cpp
         src/Systems/CollisionSystem.cpp
+
+        src/GameController.cpp
+
 
         )
 
@@ -21,7 +24,7 @@ set(Puzzle_HEADERS
         include/Components/BoardComponent.hpp
         include/Components/PieceCollisionComponent.hpp
 
-        include/Systems/BoardController.hpp
+        include/Systems/GridController.hpp
         include/Systems/PieceController.hpp
         include/Systems/TileController.hpp
         include/Systems/CollisionSystem.hpp
@@ -30,7 +33,11 @@ set(Puzzle_HEADERS
         include/Event/BaseHandlerFunction.hpp
         include/Event/HandlerFunction.hpp
         include/Event/EventSystem.hpp
-        )
+
+        include/GameController.hpp
+
+
+        include/GameEvents.hpp)
 
 
 add_executable(${PROJECT_NAME}

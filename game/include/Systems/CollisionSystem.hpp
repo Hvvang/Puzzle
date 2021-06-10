@@ -4,24 +4,21 @@
 #include <Math.hpp>
 #include <utility>
 
-
+#include <Components/PieceCollisionComponent.hpp>
 
 using ::Engine::ECS::System;
 using ::Engine::ECS::Requires;
 using ::Engine::Math::Vector2i;
 
-class PieceController;
-class BoardController;
 class PieceCollisionComponent;
 class PieceComponent;
+class GameController;
 
 class CollisionSystem : public System<Requires<PieceComponent, PieceCollisionComponent>> {
 public:
-    explicit CollisionSystem(BoardController *board, ::std::shared_ptr<PieceController> pieceController)
-        : m_boardSystem(board)
-        , m_pieceSystem(pieceController) {}
+    explicit CollisionSystem(GameController *parent = nullptr) : m_parent(parent) {};
 
-    void update(float deltaTime);
+    void update(float deltaTime = 0.f);
 
 private:
 
@@ -30,8 +27,7 @@ private:
     bool checkOffset(const PieceComponent &piece, const PieceCollisionComponent &collision,
                      int oldRotIndex, int newRotIndex, Vector2i &endOffset);
 
-private:
-    ::std::shared_ptr<PieceController> m_pieceSystem{ nullptr };
-    BoardController *m_boardSystem{ nullptr };
 
+private:
+    GameController *m_parent = { nullptr };
 };

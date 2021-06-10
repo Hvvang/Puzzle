@@ -6,12 +6,13 @@
 using ::Engine::ECS::System;
 using ::Engine::ECS::Requires;
 
-class TileController;
+class GameController;
 class PieceComponent;
 
 class PieceController : public System<Requires<PieceComponent>>, public ::MiniKit::Platform::Responder {
 public:
-    PieceController(::std::shared_ptr<TileController> tileController) : tileSystem(tileController) {};
+    explicit PieceController(GameController *parent = nullptr) : m_parent(parent) {};
+
     void update(float deltaTime);
 
     void spawnPiece(PieceComponent &piece, PieceComponent::Shape shape, const Vector2i &spawnLocation);
@@ -24,10 +25,11 @@ public:
     void KeyUp(::MiniKit::Platform::Window &window, const ::MiniKit::Platform::KeyEvent &event) noexcept override;
 
 private:
+    GameController *m_parent = { nullptr };
+
     float localTime = 0.f;
     float moveTime = 0.f;
 
-    std::shared_ptr<TileController> tileSystem{ nullptr };
 };
 
 

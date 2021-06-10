@@ -53,5 +53,5 @@ private:
 
     friend class PieceController;
     friend class CollisionSystem;
-    friend class BoardController;
+    friend class GridController;
 };
