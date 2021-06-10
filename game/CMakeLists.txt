@@ -9,6 +9,7 @@ set(Puzzle_SOURCES
         src/Systems/TileController.cpp
         src/Systems/PieceController.cpp
         src/Systems/CollisionSystem.cpp
+
         )
 
 set(Puzzle_HEADERS
@@ -23,7 +24,13 @@ set(Puzzle_HEADERS
         include/Systems/BoardController.hpp
         include/Systems/PieceController.hpp
         include/Systems/TileController.hpp
-        include/Systems/CollisionSystem.hpp)
+        include/Systems/CollisionSystem.hpp
+
+        include/Event/Event.hpp
+        include/Event/BaseHandlerFunction.hpp
+        include/Event/HandlerFunction.hpp
+        include/Event/EventSystem.hpp
+        )
 
 
 add_executable(${PROJECT_NAME}

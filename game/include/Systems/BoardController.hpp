@@ -46,4 +46,5 @@ private:
 
     ::std::vector<int> m_linesToClear;
     Vector2i m_spawnLocation{4, 0};
+
 };
