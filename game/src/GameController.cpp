@@ -31,12 +31,12 @@ GameController::GameController(MiniKit::Engine::Context &context) {
     SpriteManager->loadSprite("assets/images/LevelUp(1).png", "levelUp1");
     SpriteManager->loadSprite("assets/images/LevelUp(2).png", "levelUp2");
     SpriteManager->loadSprite("assets/images/LevelUp(3).png", "levelUp3");
+    
     auto &lvlUpSprite = m_levelUp->addComponent<Sprite>();
     lvlUpSprite.setImage("levelUp0");
     lvlUpSprite.getTransform().position = {640, 350};
     lvlUpSprite.getTransform().scale *= 0.2f;
     lvlUpSprite.getColor() = {0.9f, 0.5f, 0.f, 1.f};
-
 
     context.GetWindow().AddResponder(*m_pieceSystem);
 

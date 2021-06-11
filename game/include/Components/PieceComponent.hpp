@@ -31,6 +31,7 @@ struct PieceComponent : Component {
 
 private:
     ::std::array<::std::unique_ptr<Entity>, 4> tiles{ nullptr };
+    Color color {0.1, 0.1, 0.1};
 
     friend class PieceController;
     friend class CollisionSystem;

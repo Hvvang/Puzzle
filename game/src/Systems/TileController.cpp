@@ -27,6 +27,12 @@ void TileController::updatePosition(TileComponent &tile, const Vector2i &pos, co
                                                boardOffset.y + (pos.y) * (TileY + OffsetY)};
 }
 
+void TileController::updateColor(TileComponent &tile, const Color &color) {
+    tile.color = color;
+    auto &spriteComponent = tile.instance->getComponent<Sprite>();
+    spriteComponent.getColor() = color;
+}
+
 void TileController::rotate(TileComponent &tile, const Vector2i &origin, bool clockwise) {
         Vector2i relativePos = tile.position - origin;
         IntRect rotMatrix = clockwise
@@ -39,6 +45,8 @@ void TileController::rotate(TileComponent &tile, const Vector2i &origin, bool cl
         newPos += origin;
         updatePosition(tile, newPos);
 }
+
+
 
 
 

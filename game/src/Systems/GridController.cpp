@@ -43,15 +43,51 @@ void GridController::moveTileDown(const Vector2i &pos) {
 
         if (board.m_grid[pos.y][pos.x]->isOccupied) {
             occupyPos({pos.x, pos.y + 1}, board.m_grid[pos.y][pos.x]->tile);
+            m_parent->m_tileSystem->updatePosition(*board.m_grid[pos.y][pos.x]->tile, {pos.x, pos.y + 1});
             deOccupyPos(pos);
         }
     }
 }
 
 void GridController::removeTilesInRow(int row) {
-    for (auto col = 0; col < COLS; ++col) {
-        deOccupyPos({col, row});
-        moveTileDown({col, row - 1});
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &board = entity.getComponent<BoardComponent>();
+
+        ::std::clog << "\n----------- BOARD ----------\n";
+        for (auto &row : board.m_grid) {
+            for (auto &it : row) {
+                ::std::clog << it->isOccupied << " ";
+            }
+            ::std::clog << ::std::endl;
+        }
+
+        for (auto col = 0; col < COLS; ++col) {
+            board.m_grid[row][col]->tile->instance->erase();
+            deOccupyPos({col, row});
+        }
+
+        ::std::clog << "\n----------- BOARD ----------\n";
+        for (auto &row : board.m_grid) {
+            for (auto &it : row) {
+                ::std::clog << it->isOccupied << " ";
+            }
+            ::std::clog << ::std::endl;
+        }
+
+        for (auto r = row - 1; r >= 0; --r) {
+            for (auto col = 0; col < COLS; ++col) {
+                moveTileDown({col, r});
+            }
+        }
+
+        ::std::clog << "\n----------- BOARD ----------\n";
+        for (auto &row : board.m_grid) {
+            for (auto &it : row) {
+                ::std::clog << it->isOccupied << " ";
+            }
+            ::std::clog << ::std::endl;
+        }
     }
 }
 
@@ -109,4 +145,6 @@ void GridController::onBlockSetEvent(BlockSetEvent *) {
         auto &component = tile->getComponent<TileComponent>();
         occupyPos(component.position, &component);
     }
+    checkLinesToClear();
+    clearLines();
 }

@@ -32,6 +32,7 @@ private:
     float localTime = 0.f;
     float moveTime = 0.f;
 
+    void setColor(PieceComponent &piece, PieceComponent::Shape shape);
 };
 
 

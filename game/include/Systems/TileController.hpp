@@ -20,6 +20,7 @@ public:
 
     void move(TileComponent &tile, const Vector2i &offset);
     void updatePosition(TileComponent &tile, const Vector2i &pos, const Vector2f &boardOffset = {5.f, 4.f});
+    void updateColor(TileComponent &tile, const ::MiniKit::Graphics::Color &color);
     void rotate(TileComponent &tile, const Vector2i &origin, bool clockwise);
 
 private:

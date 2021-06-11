@@ -56,6 +56,36 @@ void PieceController::update(float deltaTime) {
     }
 }
 
+void PieceController::setColor(PieceComponent &piece, PieceComponent::Shape shape) {
+    Color color;
+    switch (shape) {
+        case PieceComponent::Shape::I:
+            color = {0.f, 0.5f, 0.7f, 1.f};
+            break;
+        case PieceComponent::Shape::O:
+            color = {0.7f, 0.5f, 0.f, 1.f};
+            break;
+        case PieceComponent::Shape::J:
+            color = {0.6f, 0.2f, 0.1f, 1.f};
+            break;
+        case PieceComponent::Shape::L:
+            color = {0.7f, 0.1f, 0.f, 1.f};
+            break;
+        case PieceComponent::Shape::T:
+            color = {0.7f, 0.8f, 0.f, 1.f};
+            break;
+        case PieceComponent::Shape::Z:
+            color = {0.f, 0.5f, 0.1f, 1.f};
+            break;
+        case PieceComponent::Shape::S:
+            color = {0.9f, 0.f, 0.8f, 1.f};
+            break;
+    }
+    for (auto i = 0u; i < 4; ++i) {
+        m_parent->m_tileSystem->updateColor(piece.tiles[i]->getComponent<TileComponent>(), color);
+    }
+}
+
 void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape shape, const Vector2i &spawnLocation, const Vector2f &boardOffset) {
     auto &tileSystem = m_parent->m_tileSystem;
     piece.shape = shape;
@@ -97,6 +127,7 @@ void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape sh
             tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1}, boardOffset);
             break;
     }
+    setColor(piece, shape);
 }
 
 ::std::array<Vector2i, 4> PieceController::getTilesPosition(const PieceComponent &piece) {

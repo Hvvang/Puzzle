@@ -29,8 +29,6 @@ struct TileComponent : Component {
     }
 
 private:
-    bool active = true;
-
     ::std::unique_ptr<Entity> instance{ nullptr };
 
     Vector2i position;
