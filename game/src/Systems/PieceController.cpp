@@ -17,41 +17,24 @@ void PieceController::update(float deltaTime) {
         auto &pieceComponent = entity.getComponent<PieceComponent>();
         auto &moveComponent = entity.getComponent<MoveComponent>();
 
-        moveComponent.previousData = {moveComponent.state, moveComponent.rotationIndex};
+        moveComponent.previousData.state = static_cast<MoveComponent::State>(moveComponent.state & ~MoveComponent::State::MoveDown);
+        moveComponent.previousData.rotationIndex = moveComponent.rotationIndex;
 
-        if (moveComponent.state & MoveComponent::State::MoveLeft) {
-            if (moveTime > 0.2f) {
-                movePiece(pieceComponent, {-1, 0});
-                moveTime = 0;
-            }
+        if (moveTime > 0.2 && moveComponent.state &
+            (MoveComponent::State::MoveLeft | MoveComponent::State::MoveRight | MoveComponent::State::SoftDownMove)) {
+            moveComponent.previousData.state = moveComponent.state;
+            movePiece(pieceComponent, moveComponent.direction[moveComponent.state]);
+            moveTime = 0;
+        } else if (moveTime > 0.2 && moveComponent.state & (MoveComponent::State::RotateLeft | MoveComponent::RotateRight)) {
+            rotatePiece(pieceComponent, moveComponent, moveComponent.state & MoveComponent::RotateRight);
+            moveTime = 0;
         }
-        if (moveComponent.state & MoveComponent::State::MoveRight) {
-            if (moveTime > 0.2f) {
-                movePiece(pieceComponent, {1, 0});
-                moveTime = 0;
-            }
-        }
-        if (moveComponent.state & MoveComponent::State::SoftDownMove) {
-            if (moveTime > 0.2f) {
-                movePiece(pieceComponent, {0, 1});
-                moveTime = 0;
-            }
-        }
-        if (moveComponent.state & MoveComponent::State::RotateLeft) {
-            if (moveTime > 0.2f) {
-                rotatePiece(pieceComponent, moveComponent, false);
-                moveTime = 0.f;
-            }
-        }
-        if (moveComponent.state & MoveComponent::State::RotateRight) {
-            if (moveTime > 0.2f) {
-                rotatePiece(pieceComponent, moveComponent, true);
-                moveTime = 0.f;
-            }
-        }
-        if (localTime >= moveComponent.m_speed) {
-            movePiece(pieceComponent, {0, 1});
-            localTime = 0.f;
+        else if (localTime > 0.6) {
+            moveComponent.previousData.state = static_cast<MoveComponent::State>(moveComponent.previousData.state |
+                                                                                 MoveComponent::State::MoveDown);
+            moveComponent.state = static_cast<MoveComponent::State>(MoveComponent::State::MoveDown);
+            movePiece(pieceComponent, moveComponent.direction[MoveComponent::State::MoveDown]);
+            localTime = 0;
         }
     }
 }
@@ -164,24 +147,24 @@ void PieceController::KeyDown(MiniKit::Platform::Window &window, const MiniKit::
     for (auto &entity : entities) {
         auto &moveComponent = entity.getComponent<MoveComponent>();
 
-        uint8_t state = static_cast<uint8_t>(moveComponent.state);
+        uint8_t state = 0;
 
         if (event.keycode == MiniKit::Platform::Keycode::KeyLeft) {
             state |= static_cast<uint8_t>(MoveComponent::State::MoveLeft);
         }
-        if (event.keycode == MiniKit::Platform::Keycode::KeyRight) {
+        else if (event.keycode == MiniKit::Platform::Keycode::KeyRight) {
             state |= static_cast<uint8_t>(MoveComponent::State::MoveRight);
         }
-        if (event.keycode == MiniKit::Platform::Keycode::KeyDown) {
+        else if (event.keycode == MiniKit::Platform::Keycode::KeyDown) {
             state |= static_cast<uint8_t>(MoveComponent::State::SoftDownMove);
         }
-        if (event.keycode == MiniKit::Platform::Keycode::KeySpace) {
+        else if (event.keycode == MiniKit::Platform::Keycode::KeySpace) {
             state |= static_cast<uint8_t>(MoveComponent::State::HardDownMove);
         }
-        if (event.keycode == MiniKit::Platform::Keycode::KeyX) {
+        else if (event.keycode == MiniKit::Platform::Keycode::KeyX) {
             state |= static_cast<uint8_t>(MoveComponent::State::RotateRight);
         }
-        if (event.keycode == MiniKit::Platform::Keycode::KeyZ) {
+        else if (event.keycode == MiniKit::Platform::Keycode::KeyZ) {
             state |= static_cast<uint8_t>(MoveComponent::State::RotateLeft);
         }
         moveComponent.state = static_cast<MoveComponent::State>(state);
@@ -192,24 +175,25 @@ void PieceController::KeyUp(MiniKit::Platform::Window &window, const MiniKit::Pl
     auto entities = getEntities();
     for (auto &entity : entities) {
         auto &moveComponent = entity.getComponent<MoveComponent>();
+
         uint8_t state = static_cast<uint8_t>(moveComponent.state);
 
         if (event.keycode == MiniKit::Platform::Keycode::KeyLeft) {
             state &= ~static_cast<uint8_t>(MoveComponent::State::MoveLeft);
         }
-        if (event.keycode == MiniKit::Platform::Keycode::KeyRight) {
+        else if (event.keycode == MiniKit::Platform::Keycode::KeyRight) {
             state &= ~static_cast<uint8_t>(MoveComponent::State::MoveRight);
         }
-        if (event.keycode == MiniKit::Platform::Keycode::KeyDown) {
+        else if (event.keycode == MiniKit::Platform::Keycode::KeyDown) {
             state &= ~static_cast<uint8_t>(MoveComponent::State::SoftDownMove);
         }
-        if (event.keycode == MiniKit::Platform::Keycode::KeySpace) {
+        else if (event.keycode == MiniKit::Platform::Keycode::KeySpace) {
             state &= ~static_cast<uint8_t>(MoveComponent::State::HardDownMove);
         }
-        if (event.keycode == MiniKit::Platform::Keycode::KeyX) {
+        else if (event.keycode == MiniKit::Platform::Keycode::KeyX) {
             state &= ~static_cast<uint8_t>(MoveComponent::State::RotateRight);
         }
-        if (event.keycode == MiniKit::Platform::Keycode::KeyZ) {
+        else if (event.keycode == MiniKit::Platform::Keycode::KeyZ) {
             state &= ~static_cast<uint8_t>(MoveComponent::State::RotateLeft);
         }
         moveComponent.state = static_cast<MoveComponent::State>(state);

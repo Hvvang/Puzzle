@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Font/Font.hpp"
+
 #include <EntityComponentSystem.hpp>
 #include <Math.hpp>
 
@@ -14,6 +16,9 @@ class GridController;
 class CollisionSystem;
 class PieceController;
 class TileController;
+
+class TextRenderer;
+class Font;
 
 namespace Engine::ECS {
     class Entity;
@@ -41,7 +46,9 @@ private:
     void updateNextPiece();
 
 private:
-    float _currentTime = 0.f;
+    MiniKit::Engine::Context &m_context;
+
+    ::std::unique_ptr<Font> m_font;
 
     ::std::unique_ptr<EventSystem> m_eventSystem{ nullptr };
     ::std::unique_ptr<Entity> m_playField{ nullptr };
@@ -52,6 +59,7 @@ private:
     ::std::unique_ptr<Entity> m_levelUp{ nullptr };
 
     ::std::shared_ptr<SpriteRenderingSystem> m_renderingSystem{ nullptr };
+    ::std::shared_ptr<TextRenderer> m_textRenderer{ nullptr };
     ::std::shared_ptr<GridController> m_gridSystem{nullptr };
     ::std::shared_ptr<CollisionSystem> m_collisionSystem{ nullptr };
     ::std::shared_ptr<PieceController> m_pieceSystem{ nullptr };

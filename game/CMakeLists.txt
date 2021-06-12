@@ -13,7 +13,9 @@ set(Puzzle_SOURCES
         src/GameController.cpp
 
 
-        )
+        src/Font/Font.cpp
+
+        src/Font/Text.cpp include/Font/Text.hpp)
 
 set(Puzzle_HEADERS
         include/App.hpp
@@ -22,22 +24,25 @@ set(Puzzle_HEADERS
 
         include/Components/TileComponent.hpp
         include/Components/BoardComponent.hpp
+        include/Components/MoveComponent.hpp
         include/Components/PieceCollisionComponent.hpp
 
         include/Systems/GridController.hpp
         include/Systems/PieceController.hpp
         include/Systems/TileController.hpp
         include/Systems/CollisionSystem.hpp
+        include/GameController.hpp
 
         include/Event/Event.hpp
         include/Event/BaseHandlerFunction.hpp
         include/Event/HandlerFunction.hpp
         include/Event/EventSystem.hpp
+        include/GameEvents.hpp
 
-        include/GameController.hpp
+        include/Font/Glyph.hpp
+        include/Font/Font.hpp
 
-
-        include/GameEvents.hpp include/Components/MoveComponent.hpp)
+        src/Font/Text.cpp include/Font/Text.hpp include/Font/TextRenderer.hpp)
 
 
 add_executable(${PROJECT_NAME}

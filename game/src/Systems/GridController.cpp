@@ -54,39 +54,14 @@ void GridController::removeTilesInRow(int row) {
     for (auto &entity : entities) {
         auto &board = entity.getComponent<BoardComponent>();
 
-        ::std::clog << "\n----------- BOARD ----------\n";
-        for (auto &row : board.m_grid) {
-            for (auto &it : row) {
-                ::std::clog << it->isOccupied << " ";
-            }
-            ::std::clog << ::std::endl;
-        }
-
         for (auto col = 0; col < COLS; ++col) {
             board.m_grid[row][col]->tile->instance->erase();
             deOccupyPos({col, row});
         }
-
-        ::std::clog << "\n----------- BOARD ----------\n";
-        for (auto &row : board.m_grid) {
-            for (auto &it : row) {
-                ::std::clog << it->isOccupied << " ";
-            }
-            ::std::clog << ::std::endl;
-        }
-
         for (auto r = row - 1; r >= 0; --r) {
             for (auto col = 0; col < COLS; ++col) {
                 moveTileDown({col, r});
             }
-        }
-
-        ::std::clog << "\n----------- BOARD ----------\n";
-        for (auto &row : board.m_grid) {
-            for (auto &it : row) {
-                ::std::clog << it->isOccupied << " ";
-            }
-            ::std::clog << ::std::endl;
         }
     }
 }

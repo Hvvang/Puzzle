@@ -10,16 +10,24 @@
 
 #include <random>
 
+#include <Font/Font.hpp>
+#include <Font/Text.hpp>
+#include <Font/TextRenderer.hpp>
+
 using ::Engine::Math::operator*=;
 
-GameController::GameController(MiniKit::Engine::Context &context) {
+GameController::GameController(MiniKit::Engine::Context &context) : m_context(context) {
     m_eventSystem = ::std::make_unique<EventSystem>();
 
-    m_renderingSystem = ::std::make_shared<SpriteRenderingSystem>(context);
+    m_renderingSystem = ::std::make_shared<SpriteRenderingSystem>();
+    m_textRenderer = ::std::make_shared<TextRenderer>();
     m_gridSystem = ::std::make_shared<GridController>(this);
     m_collisionSystem = ::std::make_shared<CollisionSystem>(this);
     m_pieceSystem = ::std::make_shared<PieceController>(this);
     m_tileSystem = ::std::make_shared<TileController>(this);
+
+    SpriteManager->loadSprite("assets/images/font_texture.png", "Roboto");
+    m_font = ::std::make_unique<Font>("Roboto", 1000, 90);
 
     /// FOR TEST
     m_levelUp = ::std::make_unique<Entity>(entityManager->createEntity());
@@ -40,6 +48,7 @@ GameController::GameController(MiniKit::Engine::Context &context) {
 
     context.GetWindow().AddResponder(*m_pieceSystem);
 
+    entityManager->addSystem(*m_textRenderer);
     entityManager->addSystem(*m_renderingSystem);
     entityManager->addSystem(*m_gridSystem);
     entityManager->addSystem(*m_collisionSystem);
@@ -61,7 +70,6 @@ GameController::GameController(MiniKit::Engine::Context &context) {
 
     updateNextPiece();
     updatePieces();
-//    m_levelUp->activate();
 
     m_eventSystem->connect(this, &GameController::updatePieces);
 }
@@ -106,29 +114,15 @@ void GameController::spawnPiece() {
 }
 
 void GameController::update(float deltaTime) {
-    _currentTime += deltaTime;
-    if (_currentTime > 1.f) {
-        auto &lvlUpSprite = m_levelUp->getComponent<Sprite>();
-        lvlUpSprite.setImage("levelUp0");
-        _currentTime = 0.f;
-    } else if (_currentTime > 0.75f) {
-        auto &lvlUpSprite = m_levelUp->getComponent<Sprite>();
-        lvlUpSprite.setImage("levelUp3");
-    } else if (_currentTime > 0.5f) {
-        auto &lvlUpSprite = m_levelUp->getComponent<Sprite>();
-        lvlUpSprite.setImage("levelUp2");
-    } else if (_currentTime > 0.25f) {
-        auto &lvlUpSprite = m_levelUp->getComponent<Sprite>();
-        lvlUpSprite.setImage("levelUp1");
-    } else if (_currentTime > 0.f) {
-        auto &lvlUpSprite = m_levelUp->getComponent<Sprite>();
-        lvlUpSprite.setImage("levelUp0");
-    }
-
+    auto& graphicsDevice = m_context.GetGraphicsDevice();
+    auto& commandBuffer = graphicsDevice.BeginFrame(1.f, 1.f, 1.f, 1.f);
 
     m_pieceSystem->update(deltaTime);
     m_collisionSystem->update(deltaTime);
     m_gridSystem->update(deltaTime);
-    m_renderingSystem->update(deltaTime);
+    m_renderingSystem->update(deltaTime, commandBuffer);
+    m_textRenderer->update(deltaTime, commandBuffer);
+
+    graphicsDevice.EndFrame(commandBuffer);
 }
 

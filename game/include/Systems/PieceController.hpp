@@ -18,6 +18,7 @@ public:
     void update(float deltaTime);
 
     void spawnPiece(PieceComponent &piece, PieceComponent::Shape shape, const Vector2i &spawnLocation , const Vector2f &boardOffset = {5.f, 4.f});
+    void setColor(PieceComponent &piece, PieceComponent::Shape shape);
 
     ::std::array<Vector2i, 4> getTilesPosition(const PieceComponent &piece);
     void movePiece(PieceComponent &piece, const Vector2i &offset);
@@ -32,7 +33,6 @@ private:
     float localTime = 0.f;
     float moveTime = 0.f;
 
-    void setColor(PieceComponent &piece, PieceComponent::Shape shape);
 };
 
 
