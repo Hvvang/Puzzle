@@ -16,9 +16,9 @@ class GridController;
 class CollisionSystem;
 class PieceController;
 class TileController;
+class ScoreSystem;
 
 class TextRenderer;
-class Font;
 
 namespace Engine::ECS {
     class Entity;
@@ -36,6 +36,7 @@ using ::Engine::ECS::SpriteRenderingSystem;
 class GameController {
 public:
     GameController(MiniKit::Engine::Context &context);
+    ~GameController();
 
     void update(float deltaTime);
 
@@ -47,8 +48,6 @@ private:
 
 private:
     MiniKit::Engine::Context &m_context;
-
-    ::std::unique_ptr<Font> m_font;
 
     ::std::unique_ptr<EventSystem> m_eventSystem{ nullptr };
     ::std::unique_ptr<Entity> m_playField{ nullptr };
@@ -64,11 +63,13 @@ private:
     ::std::shared_ptr<CollisionSystem> m_collisionSystem{ nullptr };
     ::std::shared_ptr<PieceController> m_pieceSystem{ nullptr };
     ::std::shared_ptr<TileController> m_tileSystem{ nullptr };
+    ::std::shared_ptr<ScoreSystem> m_scoreSystem{ nullptr };
 
     friend class GridController;
     friend class CollisionSystem;
     friend class PieceController;
     friend class TileController;
+    friend class ScoreSystem;
 
 
 };

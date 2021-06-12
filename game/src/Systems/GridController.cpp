@@ -95,6 +95,7 @@ void GridController::clearLines() {
     for (auto &lineIndex : m_linesToClear) {
         removeTilesInRow(lineIndex);
     }
+    m_parent->m_eventSystem->emit(new LinesClearEvent(m_linesToClear));
     m_linesToClear.clear();
 }
 

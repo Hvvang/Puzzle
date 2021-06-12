@@ -23,27 +23,26 @@ void CollisionSystem::update(float) {
             Vector2i endOffset{0, 0};
             bool clockwise = moveComponent.state & MoveComponent::State::RotateRight;
 
-            if (!checkOffset(piece, collision, moveComponent.previousData.rotationIndex, moveComponent.rotationIndex, endOffset)) {
+            if (!checkOffset(piece, collision, moveComponent.previousData.rotationIndex,
+                             moveComponent.rotationIndex, endOffset)) {
                 m_parent->m_pieceSystem->rotatePiece(piece, moveComponent, !clockwise);
             } else {
                 m_parent->m_pieceSystem->movePiece(piece, endOffset);
             }
         }
-        else if (!checkMovePiece(m_parent->m_pieceSystem->getTilesPosition(piece), {0, 0})
-            && (moveComponent.state & (MoveComponent::State::MoveRight | MoveComponent::State::MoveLeft))) {
-            bool isRightMove = (moveComponent.state & MoveComponent::State::MoveRight);
-            bool isLeftMove = (moveComponent.state & MoveComponent::State::MoveLeft);
-            auto backOffset = Vector2i{-isRightMove + isLeftMove, 0};
+        else if (!checkMovePiece(m_parent->m_pieceSystem->getTilesPosition(piece), {0, 0})) {
+            if (moveComponent.state & (MoveComponent::State::MoveRight | MoveComponent::State::MoveLeft)) {
+                bool isRightMove = (moveComponent.state & MoveComponent::State::MoveRight);
+                bool isLeftMove = (moveComponent.state & MoveComponent::State::MoveLeft);
+                auto backOffset = Vector2i{-isRightMove + isLeftMove, 0};
 
-            m_parent->m_pieceSystem->movePiece(piece, backOffset);
+                m_parent->m_pieceSystem->movePiece(piece, backOffset);
+            } else {
+                m_parent->m_pieceSystem->movePiece(piece, {0, -1});
+                m_parent->m_eventSystem->emit(new SoftDropCollidedEvent());
+                m_parent->m_eventSystem->emit(new BlockSetEvent());
+            }
         }
-        else if (!checkMovePiece(m_parent->m_pieceSystem->getTilesPosition(piece), {0, 0})
-            && (moveComponent.state & (MoveComponent::State::MoveDown | MoveComponent::State::SoftDownMove))) {
-
-            m_parent->m_pieceSystem->movePiece(piece, {0, -1});
-            m_parent->m_eventSystem->emit(new BlockSetEvent());
-        }
-
     }
 }
 

@@ -2,7 +2,7 @@
 
 #include <Font/Text.hpp>
 
-class TextRenderer : public System<Requires < Text>> {
+class TextRenderer : public System<Requires<Text>> {
 public:
     void update(float deltaTime, CommandBuffer &commandBuffer) {
         auto entities = getEntities();

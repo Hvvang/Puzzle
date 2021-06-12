@@ -25,6 +25,11 @@ void PieceController::update(float deltaTime) {
             moveComponent.previousData.state = moveComponent.state;
             movePiece(pieceComponent, moveComponent.direction[moveComponent.state]);
             moveTime = 0;
+            if (moveComponent.state & MoveComponent::State::SoftDownMove) {
+                m_parent->m_eventSystem->emit(new SoftDropEvent());
+            } else if (moveComponent.state & MoveComponent::State::HardDownMove) {
+                m_parent->m_eventSystem->emit(new SoftDropEvent());
+            }
         } else if (moveTime > 0.2 && moveComponent.state & (MoveComponent::State::RotateLeft | MoveComponent::RotateRight)) {
             rotatePiece(pieceComponent, moveComponent, moveComponent.state & MoveComponent::RotateRight);
             moveTime = 0;
@@ -52,7 +57,7 @@ void PieceController::setColor(PieceComponent &piece, PieceComponent::Shape shap
             color = {0.6f, 0.2f, 0.1f, 1.f};
             break;
         case PieceComponent::Shape::L:
-            color = {0.7f, 0.1f, 0.f, 1.f};
+            color = {0.7f, 0.1f, 0.3f, 1.f};
             break;
         case PieceComponent::Shape::T:
             color = {0.7f, 0.8f, 0.f, 1.f};

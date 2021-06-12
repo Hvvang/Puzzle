@@ -9,19 +9,21 @@ set(Puzzle_SOURCES
         src/Systems/TileController.cpp
         src/Systems/PieceController.cpp
         src/Systems/CollisionSystem.cpp
+        src/Systems/ScoreSystem.cpp
 
         src/GameController.cpp
 
-
         src/Font/Font.cpp
+        src/Font/Text.cpp
 
-        src/Font/Text.cpp include/Font/Text.hpp)
+        )
 
 set(Puzzle_HEADERS
         include/App.hpp
 
         include/Components/PieceComponent.hpp
 
+        include/Components/ScoreComponent.hpp
         include/Components/TileComponent.hpp
         include/Components/BoardComponent.hpp
         include/Components/MoveComponent.hpp
@@ -31,6 +33,7 @@ set(Puzzle_HEADERS
         include/Systems/PieceController.hpp
         include/Systems/TileController.hpp
         include/Systems/CollisionSystem.hpp
+        include/Systems/ScoreSystem.hpp
         include/GameController.hpp
 
         include/Event/Event.hpp
@@ -41,8 +44,10 @@ set(Puzzle_HEADERS
 
         include/Font/Glyph.hpp
         include/Font/Font.hpp
+        include/Font/Text.hpp
+        include/Font/TextRenderer.hpp
 
-        src/Font/Text.cpp include/Font/Text.hpp include/Font/TextRenderer.hpp)
+        )
 
 
 add_executable(${PROJECT_NAME}

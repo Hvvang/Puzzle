@@ -15,6 +15,8 @@ public:
 
     void draw(::MiniKit::Graphics::CommandBuffer &commandBuffer) override;
 
+    void setText(const ::std::string &text) { m_text = text; }
+
 private:
     Font &m_font;
     ::std::string m_text;
