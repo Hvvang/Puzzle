@@ -2,6 +2,9 @@
 
 #include <Font/Text.hpp>
 
+using ::Engine::ECS::System;
+using ::Engine::ECS::Requires;
+
 class TextRenderer : public System<Requires<Text>> {
 public:
     void update(float deltaTime, CommandBuffer &commandBuffer) {

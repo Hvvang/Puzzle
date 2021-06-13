@@ -11,11 +11,13 @@ set(Puzzle_SOURCES
         src/Systems/CollisionSystem.cpp
         src/Systems/ScoreSystem.cpp
 
+        src/MenuController.cpp
         src/GameController.cpp
 
         src/Font/Font.cpp
         src/Font/Text.cpp
 
+        src/Button.cpp
         )
 
 set(Puzzle_HEADERS
@@ -34,7 +36,9 @@ set(Puzzle_HEADERS
         include/Systems/TileController.hpp
         include/Systems/CollisionSystem.hpp
         include/Systems/ScoreSystem.hpp
+
         include/GameController.hpp
+        include/MenuController.hpp
 
         include/Event/Event.hpp
         include/Event/BaseHandlerFunction.hpp
@@ -47,6 +51,7 @@ set(Puzzle_HEADERS
         include/Font/Text.hpp
         include/Font/TextRenderer.hpp
 
+        include/Button.hpp
         )
 
 

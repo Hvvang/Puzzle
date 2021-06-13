@@ -55,4 +55,15 @@ void ScoreSystem::onSoftDrop(SoftDropEvent *e) {
     }
 }
 
+void ScoreSystem::resetScore() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &score = entity.getComponent<ScoreComponent>();
+
+        score.lvl = 1;
+        score.scr = 0;
+        score.lns = 0;
+    }
+}
+
 

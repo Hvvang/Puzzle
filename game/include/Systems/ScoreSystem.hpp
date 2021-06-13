@@ -19,6 +19,8 @@ class ScoreSystem : public System<Requires<ScoreComponent>> {
 public:
     explicit ScoreSystem(GameController *parent = nullptr);;
 
+    void resetScore();
+
     void update(float deltaTime);
 
     void onLinesClear(LinesClearEvent *);
@@ -29,5 +31,3 @@ private:
     int m_clearLines{0};
 
 };
-
-

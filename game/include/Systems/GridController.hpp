@@ -19,6 +19,8 @@ public:
 
     bool isPosEmpty(const Vector2i &pos);
 
+    void resetBoard();
+
 private:
 
     void occupyPos(const Vector2i &pos, TileComponent *target);

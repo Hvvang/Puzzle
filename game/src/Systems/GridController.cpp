@@ -115,7 +115,7 @@ bool GridController::isPosEmpty(const Vector2i &pos) {
 }
 
 void GridController::onBlockSetEvent(BlockSetEvent *) {
-    auto &piece = m_parent->m_currentPiece.getComponent<PieceComponent>();
+    auto &piece = m_parent->m_currentPiece->getComponent<PieceComponent>();
 
     for (auto &tile : piece.tiles) {
         auto &component = tile->getComponent<TileComponent>();
@@ -123,4 +123,17 @@ void GridController::onBlockSetEvent(BlockSetEvent *) {
     }
     checkLinesToClear();
     clearLines();
+}
+
+void GridController::resetBoard() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &board = entity.getComponent<BoardComponent>();
+
+        for (auto row = 0; row < ROWS; ++row) {
+            for (auto col = 0; col < COLS; ++col) {
+                board.m_grid[row][col] = ::std::make_unique<BoardBlock>(Vector2i{row, col});
+            }
+        }
+    }
 }
