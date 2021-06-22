@@ -19,7 +19,7 @@ using ::Engine::Math::operator+;
 struct PieceComponent : Component {
 
     enum class Shape : uint8_t {
-        I, O, J, L, T, Z, S
+        I = 'I', O = 'O', J = 'J', L = 'L', T = 'T', Z = 'Z', S = 'S'
     } shape;
 
     PieceComponent() {

@@ -29,12 +29,19 @@ struct ScoreComponent : Component  {
         levelText.getColor() = {240.f / 255.f, 110.f / 255.f, 0.f, 1.f};
         scoreText.getColor() = {240.f / 255.f, 110.f / 255.f, 0.f, 1.f};
         linesText.getColor() = {240.f / 255.f, 110.f / 255.f, 0.f, 1.f};
+    }
 
+    void activate() {
         level->activate();
         score->activate();
         lines->activate();
     }
 
+    void deactivate() {
+        level->deactivate();
+        score->deactivate();
+        lines->deactivate();
+    }
 
     ::std::unique_ptr<Entity> level{ nullptr };
     ::std::unique_ptr<Entity> score{ nullptr };

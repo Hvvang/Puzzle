@@ -6,6 +6,8 @@
 
 #include <Components/MoveComponent.hpp>
 
+#include <Settings.hpp>
+
 using ::Engine::Math::operator-;
 
 void PieceController::update(float deltaTime) {
@@ -45,30 +47,9 @@ void PieceController::update(float deltaTime) {
 }
 
 void PieceController::setColor(PieceComponent &piece, PieceComponent::Shape shape) {
-    Color color;
-    switch (shape) {
-        case PieceComponent::Shape::I:
-            color = {0.f, 0.5f, 0.7f, 1.f};
-            break;
-        case PieceComponent::Shape::O:
-            color = {0.7f, 0.5f, 0.f, 1.f};
-            break;
-        case PieceComponent::Shape::J:
-            color = {0.6f, 0.2f, 0.1f, 1.f};
-            break;
-        case PieceComponent::Shape::L:
-            color = {0.7f, 0.1f, 0.3f, 1.f};
-            break;
-        case PieceComponent::Shape::T:
-            color = {0.7f, 0.8f, 0.f, 1.f};
-            break;
-        case PieceComponent::Shape::Z:
-            color = {0.f, 0.5f, 0.1f, 1.f};
-            break;
-        case PieceComponent::Shape::S:
-            color = {0.9f, 0.f, 0.8f, 1.f};
-            break;
-    }
+    json _json_color = settings->getValue("Tetrominos")[static_cast<uint8_t>(shape)].at(1)["Color"];
+    Color color = {_json_color.at(0), _json_color.at(1), _json_color.at(2), _json_color.at(3)};
+
     for (auto i = 0u; i < 4; ++i) {
         m_parent->m_tileSystem->updateColor(piece.tiles[i]->getComponent<TileComponent>(), color);
     }
@@ -77,43 +58,11 @@ void PieceController::setColor(PieceComponent &piece, PieceComponent::Shape shap
 void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape shape, const Vector2i &spawnLocation, const Vector2f &boardOffset) {
     auto &tileSystem = m_parent->m_tileSystem;
     piece.shape = shape;
-    tileSystem->updatePosition(piece.tiles[0]->getComponent<TileComponent>(), spawnLocation, boardOffset);
-    switch (piece.shape) {
-        case PieceComponent::Shape::I:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{2, 0}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
-            break;
-        case PieceComponent::Shape::O:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, -1}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1}, boardOffset);
-            break;
-        case PieceComponent::Shape::J:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, -1}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
-            break;
-        case PieceComponent::Shape::L:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, -1}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
-            break;
-        case PieceComponent::Shape::T:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
-            break;
-        case PieceComponent::Shape::Z:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, -1}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, 0}, boardOffset);
-            break;
-        case PieceComponent::Shape::S:
-            tileSystem->updatePosition(piece.tiles[1]->getComponent<TileComponent>(),spawnLocation + Vector2i{-1, 0}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[2]->getComponent<TileComponent>(),spawnLocation + Vector2i{1, -1}, boardOffset);
-            tileSystem->updatePosition(piece.tiles[3]->getComponent<TileComponent>(),spawnLocation + Vector2i{0, -1}, boardOffset);
-            break;
+
+    for (unsigned i = 0; i < 4; ++i) {
+        int x = settings->getValue("Tetrominos")[static_cast<uint8_t>(shape)].at(i)["Shape"].at(0).at(0);
+        int y = settings->getValue("Tetrominos")[static_cast<uint8_t>(shape)].at(i)["Shape"].at(0).at(1);
+        tileSystem->updatePosition(piece.tiles[i]->getComponent<TileComponent>(), spawnLocation + Vector2i({x, y}), boardOffset);
     }
     setColor(piece, shape);
 }

@@ -11,12 +11,13 @@
 
 #include <memory>
 
+class App;
+
 class GridController;
 class CollisionSystem;
 class PieceController;
 class TileController;
 class ScoreSystem;
-
 
 namespace Engine::ECS {
     class Entity;
@@ -32,7 +33,7 @@ using ::Engine::ECS::Entity;
 
 class GameController {
 public:
-    explicit GameController(MiniKit::Engine::Context &context);
+    explicit GameController(App *parent, MiniKit::Engine::Context &context);
     ~GameController();
 
     void update(float deltaTime);
@@ -52,6 +53,7 @@ private:
     void updateNextPiece();
 
 private:
+    App *m_parent{ nullptr };
     MiniKit::Engine::Context &m_context;
 
     ::std::unique_ptr<Entity> m_playField{ nullptr };
@@ -71,6 +73,4 @@ private:
     friend class PieceController;
     friend class TileController;
     friend class ScoreSystem;
-
-
 };

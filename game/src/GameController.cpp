@@ -15,7 +15,7 @@
 
 using ::Engine::Math::operator*=;
 
-GameController::GameController(MiniKit::Engine::Context &context) : m_context(context) {
+GameController::GameController(App *parent, MiniKit::Engine::Context &context) : m_parent(parent), m_context(context) {
     m_eventSystem = ::std::make_unique<EventSystem>();
 
     m_gridSystem = ::std::make_shared<GridController>(this);
@@ -112,16 +112,18 @@ void GameController::resumeGame() {
 
 void GameController::activate() {
     m_playField->activate();
+    m_scoreSystem->activate();
     m_currentPiece->activate();
     m_nextPiece->activate();
-    m_ghostPiece->activate();
+//    m_ghostPiece->activate();
 }
 
 void GameController::deactivate() {
     m_playField->deactivate();
     m_currentPiece->deactivate();
+    m_scoreSystem->deactivate();
     m_nextPiece->deactivate();
-    m_ghostPiece->deactivate();
+//    m_ghostPiece->deactivate();
 }
 
 

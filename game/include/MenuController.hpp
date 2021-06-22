@@ -3,6 +3,8 @@
 #include <EntityComponentSystem.hpp>
 #include <Utils/Button.hpp>
 
+class App;
+
 namespace Engine::ECS {
     class Entity;
     class SpriteRenderingSystem;
@@ -20,22 +22,25 @@ public:
     enum Menu {
         NewGame = 0,
         Resume = 1,
-        Settings = 2,
+        SettingsMenu = 2,
         Quit = 3
-    } currentPage;
+    } currentPage{NewGame};
 
-    explicit MenuController(MiniKit::Engine::Context &context);
+    explicit MenuController(App *parent, MiniKit::Engine::Context &context);
 
     void update(float deltaTime);
 
     void KeyDown(Window &window, const KeyEvent &event) noexcept override;
 
+    void deactivate();
+
+    void activate();
+
 private:
+    App *m_parent{ nullptr };
     MiniKit::Engine::Context &m_context;
 
     bool open = false;
-    bool _ghostPiece = true;
-    bool _animation = true;
 
     ::std::chrono::milliseconds now;
     ::std::chrono::milliseconds inputDelay{0};

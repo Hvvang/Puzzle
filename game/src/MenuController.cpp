@@ -1,13 +1,14 @@
 #include "MenuController.hpp"
 #include <EntityManager.hpp>
 #include <Components/Sprite.hpp>
-
+#include <Settings.hpp>
+#include <App.hpp>
 #include <imgui.h>
 
 using ::Engine::ECS::Sprite;
 using ::Engine::Math::operator*=;
 
-MenuController::MenuController(MiniKit::Engine::Context &context) : m_context(context), currentPage(Menu::NewGame) {
+MenuController::MenuController(App *parent, MiniKit::Engine::Context &context) : m_parent(parent), m_context(context) {
     SpriteManager->loadSprite("assets/images/Menu.png", "menu_background");
 
     m_background = ::std::make_unique<Entity>(entityManager->createEntity());
@@ -26,17 +27,24 @@ MenuController::MenuController(MiniKit::Engine::Context &context) : m_context(co
 
 void MenuController::update(float) {
     if (open) {
+        bool _animation = settings->getValue("Animation");
+        bool _ghostPiece = settings->getValue("Ghost piece");
+
         switch (currentPage) {
             case Menu::NewGame:
+                m_parent->ChangeState();
                 break;
             case Menu::Resume:
+                m_parent->ChangeState();
                 break;
-            case Menu::Settings:
+            case Menu::SettingsMenu:
                 ::ImGui::Begin("Settings", NULL,
                                ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
                 ::ImGui::Checkbox("Ghost piece", &_ghostPiece);
                 ::ImGui::Checkbox("Animation", &_animation);
+                settings->setValue("Ghost piece", _ghostPiece);
+                settings->setValue("Animation", _animation);
                 ::ImGui::End();
                 break;
             case Menu::Quit:
@@ -74,6 +82,20 @@ void MenuController::KeyDown(Window &window, const KeyEvent &event) noexcept {
                 break;
         }
         inputDelay = now;
+    }
+}
+
+void MenuController::deactivate() {
+    m_background->deactivate();
+    for (auto &button : m_menuButtons) {
+        button->deactivate();
+    }
+}
+
+void MenuController::activate() {
+    m_background->activate();
+    for (auto &button : m_menuButtons) {
+        button->activate();
     }
 }
 

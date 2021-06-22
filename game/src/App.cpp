@@ -1,13 +1,14 @@
 #include "App.hpp"
 #include <Systems/SpriteRenderingSystem.hpp>
 #include <Font/TextRenderer.hpp>
+#include <Settings.hpp>
 
 ::std::error_code App::Start(MiniKit::Engine::Context &context) noexcept {
     m_screen = ::std::make_unique<Screen>(context);
     m_entityManager = ::std::make_unique<EntityManager>();
     m_spriteManager = ::std::make_unique<SpriteLoader>(context);
-    m_menuManager = ::std::make_unique<MenuController>(context);
-//    m_gameManager = ::std::make_unique<GameController>(context);
+    m_menuManager = ::std::make_unique<MenuController>(this, context);
+    m_gameManager = ::std::make_unique<GameController>(this, context);
     m_renderingSystem = ::std::make_shared<SpriteRenderingSystem>();
     m_textRenderer = ::std::make_shared<TextRenderer>();
 
@@ -30,14 +31,33 @@ void App::Tick(MiniKit::Engine::Context &context) noexcept {
 
     m_entityManager->refresh();
 
-//    if (isGame) {
-//        m_gameManager->update(context.GetFrameDelta());
-//    } else {
-        m_menuManager->update(context.GetFrameDelta());
-//    }
+    switch (m_currentState) {
+        case State::Game:
+            m_gameManager->update(context.GetFrameDelta());
+            break;
+        case State::Menu:
+            m_menuManager->update(context.GetFrameDelta());
+            break;
+    }
 
     m_renderingSystem->update(context.GetFrameDelta(), commandBuffer);
     m_textRenderer->update(context.GetFrameDelta(), commandBuffer);
 
     graphicsDevice.EndFrame(commandBuffer);
+}
+
+void App::ChangeState() {
+
+    if (m_currentState == State::Menu) {
+        m_menuManager->deactivate();
+        m_gameManager->activate();
+        if (m_menuManager->currentPage == MenuController::NewGame) {
+            m_gameManager->resetGame();
+        }
+        else if (m_menuManager->currentPage == MenuController::Resume) {
+
+        }
+    }
+
+    m_currentState = m_currentState == State::Menu ? State::Game : State::Menu;
 }

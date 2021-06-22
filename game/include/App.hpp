@@ -19,12 +19,21 @@ using ::Engine::ECS::EntityManager;
 using ::Engine::Loader::SpriteLoader;
 
 class App final : public ::MiniKit::Engine::Application {
+
+    enum class State {
+        Menu,
+        Game
+    } m_currentState{State::Menu};
+
 public:
+
     ::std::error_code Start(::MiniKit::Engine::Context &context) noexcept override;
 
     ::std::error_code Shutdown(::MiniKit::Engine::Context &context) noexcept override;
 
     void Tick(::MiniKit::Engine::Context &context) noexcept override;
+
+    void ChangeState();
 
 
 private:

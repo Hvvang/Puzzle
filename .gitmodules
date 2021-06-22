@@ -1,3 +1,6 @@
 [submodule "Engine"]
 	path = Engine
 	url = https://github.com/Hvvang/GameEngine
+[submodule "external/json"]
+	path = external/json
+	url = https://github.com/nlohmann/json.git

@@ -52,11 +52,9 @@ set(Puzzle_HEADERS
 
         include/Utils/Button.hpp
 
-        include/StateMachines/MenuStateMachine.hpp
-        include/StateMachines/MachineEvents.hpp
         include/StateMachines/StateMachine.hpp
 
-        )
+        src/Settings.cpp include/Settings.hpp)
 
 
 add_executable(${PROJECT_NAME}
@@ -89,6 +87,8 @@ target_link_libraries(${PROJECT_NAME}
         Engine::ECS
         Engine::Input
         Engine::View
+
+        nlohmann_json::nlohmann_json
         )
 
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/..")
