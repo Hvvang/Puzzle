@@ -21,7 +21,7 @@ MenuController::MenuController(MiniKit::Engine::Context &context) : m_context(co
     m_menuButtons.push_back(::std::make_unique<Button>("Settings", Vector2f{260.f, 420.f}));
     m_menuButtons.push_back(::std::make_unique<Button>("Quit", Vector2f{300.f, 480.f}));
 
-    m_menuButtons.at(0)->setActive(true);
+    m_menuButtons.at(0)->setState(true);
 }
 
 void MenuController::update(float) {
@@ -57,16 +57,16 @@ void MenuController::KeyDown(Window &window, const KeyEvent &event) noexcept {
                 break;
             case MiniKit::Platform::Keycode::KeyUp:
                 if (currentPage > Menu::NewGame && !open) {
-                    m_menuButtons.at(currentPage)->setActive(false);
+                    m_menuButtons.at(currentPage)->setState(false);
                     currentPage = static_cast<Menu>(currentPage - 1);
-                    m_menuButtons.at(currentPage)->setActive(true);
+                    m_menuButtons.at(currentPage)->setState(true);
                 }
                 break;
             case MiniKit::Platform::Keycode::KeyDown:
                 if (currentPage < Menu::Quit && !open) {
-                    m_menuButtons.at(currentPage)->setActive(false);
+                    m_menuButtons.at(currentPage)->setState(false);
                     currentPage = static_cast<Menu>(currentPage + 1);
-                    m_menuButtons.at(currentPage)->setActive(true);
+                    m_menuButtons.at(currentPage)->setState(true);
                 }
                 break;
             case MiniKit::Platform::Keycode::KeyEscape:

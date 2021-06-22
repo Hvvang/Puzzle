@@ -31,7 +31,7 @@ void Text::draw(MiniKit::Graphics::CommandBuffer &commandBuffer) {
     for (char ch : m_text) {
         const auto &glyph = m_font.getGlyph(uint32_t(ch));
 
-        info.position.x += float(m_font.getGlyphSize()) / 2.25;
+        info.position.x += float(m_font.getGlyphSize()) / 2.f;
 
         commandBuffer.Draw(info, {
             glyph.textureRect.x,
@@ -39,7 +39,6 @@ void Text::draw(MiniKit::Graphics::CommandBuffer &commandBuffer) {
             glyph.textureRect.width,
             glyph.textureRect.height
         });
-//        commandBuffer.Draw(info);
     }
 
 }

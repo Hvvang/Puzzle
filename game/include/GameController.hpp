@@ -7,7 +7,7 @@
 
 #include <Event/Event.hpp>
 #include <Event/EventSystem.hpp>
-#include <GameEvents.hpp>
+#include <Event/GameEvents.hpp>
 
 #include <memory>
 

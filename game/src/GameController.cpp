@@ -83,7 +83,7 @@ void GameController::updateNextPiece() {
 
 void GameController::spawnPiece() {
     m_currentPiece = ::std::make_unique<Entity>(entityManager->createEntity());
-
+    
     auto &pieceComponent = m_currentPiece->addComponent<PieceComponent>();
     auto shape = m_nextPiece->getComponent<PieceComponent>().shape;
     m_currentPiece->addComponent<PieceCollisionComponent>(shape);

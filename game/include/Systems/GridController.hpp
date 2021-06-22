@@ -2,7 +2,7 @@
 
 #include <EntityComponentSystem.hpp>
 #include <Components/BoardComponent.hpp>
-#include <GameEvents.hpp>
+#include <Event/GameEvents.hpp>
 
 using ::Engine::ECS::System;
 using ::Engine::ECS::Requires;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <EntityComponentSystem.hpp>
-#include <Button.hpp>
+#include <Utils/Button.hpp>
 
 namespace Engine::ECS {
     class Entity;

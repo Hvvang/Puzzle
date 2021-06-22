@@ -6,7 +6,7 @@
 
 #include <GameController.hpp>
 
-#include <GameEvents.hpp>
+#include <Event/GameEvents.hpp>
 
 #include <Components/MoveComponent.hpp>
 

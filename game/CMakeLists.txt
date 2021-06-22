@@ -17,7 +17,6 @@ set(Puzzle_SOURCES
         src/Font/Font.cpp
         src/Font/Text.cpp
 
-        src/Button.cpp
         )
 
 set(Puzzle_HEADERS
@@ -44,14 +43,19 @@ set(Puzzle_HEADERS
         include/Event/BaseHandlerFunction.hpp
         include/Event/HandlerFunction.hpp
         include/Event/EventSystem.hpp
-        include/GameEvents.hpp
+        include/Event/GameEvents.hpp
 
         include/Font/Glyph.hpp
         include/Font/Font.hpp
         include/Font/Text.hpp
         include/Font/TextRenderer.hpp
 
-        include/Button.hpp
+        include/Utils/Button.hpp
+
+        include/StateMachines/MenuStateMachine.hpp
+        include/StateMachines/MachineEvents.hpp
+        include/StateMachines/StateMachine.hpp
+
         )
 
 
