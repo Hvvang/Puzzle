@@ -26,24 +26,13 @@ public:
     void onLinesClear(LinesClearEvent *);
     void onSoftDrop(SoftDropEvent *);
 
-    void activate() {
-        auto entities = getEntities();
-        for (auto &entity : entities) {
-            entity.getComponent<ScoreComponent>().activate();
-        }
-    }
+    void activate();
 
-    void deactivate() {
-        auto entities = getEntities();
-        for (auto &entity : entities) {
-            entity.getComponent<ScoreComponent>().deactivate();
-        }
-    }
+    void deactivate();
 
 private:
     GameController *m_parent = { nullptr };
     int m_clearLines{0};
 
 };
-
 

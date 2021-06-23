@@ -66,4 +66,18 @@ void ScoreSystem::resetScore() {
     }
 }
 
+void ScoreSystem::activate() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        entity.getComponent<ScoreComponent>().activate();
+    }
+}
+
+void ScoreSystem::deactivate() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        entity.getComponent<ScoreComponent>().deactivate();
+    }
+}
+
 

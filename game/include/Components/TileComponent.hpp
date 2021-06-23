@@ -25,7 +25,6 @@ struct TileComponent : Component {
         spriteComponent.getColor() = color;
         spriteComponent.getTransform().scale = {TileX * 2.f / static_cast<float>(spriteComponent.getTileRect().size.x),
                                                 TileY * 2.f / static_cast<float>(spriteComponent.getTileRect().size.y)};
-        instance->activate();
     }
 
 private:
@@ -37,4 +36,5 @@ private:
     friend class GridController;
     friend class TileController;
     friend class PieceController;
+    friend class PieceComponent;
 };

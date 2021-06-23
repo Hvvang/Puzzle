@@ -27,11 +27,22 @@ namespace Engine::ECS {
 namespace MiniKit::Engine {
     class Context;
 }
+using ::MiniKit::Platform::Responder;
+using ::MiniKit::Platform::Window;
+using ::MiniKit::Platform::KeyEvent;
 
 using ::Engine::Math::Vector2i;
 using ::Engine::ECS::Entity;
 
-class GameController {
+class GameController : public Responder  {
+    enum class State {
+        Spawn,
+        Fall,
+        ClearLine,
+        PieceBlock,
+        Pause
+    } m_currentState{State::Spawn};
+
 public:
     explicit GameController(App *parent, MiniKit::Engine::Context &context);
     ~GameController();
@@ -41,20 +52,24 @@ public:
     void initPlayFieldBackground();
     void updatePieces(BlockSetEvent *event = nullptr);
 
-    void pauseGame();
-    void overGame();
-    void resetGame();
-    void resumeGame();
     void activate();
     void deactivate();
+
+    void NewGameState();
+    void ResumeGameState();
 
 private:
     void spawnPiece();
     void updateNextPiece();
 
+    void KeyDown(Window &window, const KeyEvent &event) noexcept override;
+
 private:
     App *m_parent{ nullptr };
     MiniKit::Engine::Context &m_context;
+
+    ::std::chrono::milliseconds now;
+    ::std::chrono::milliseconds inputDelay{0};
 
     ::std::unique_ptr<Entity> m_playField{ nullptr };
     ::std::unique_ptr<Entity> m_currentPiece{ nullptr };
@@ -62,7 +77,7 @@ private:
     ::std::unique_ptr<Entity> m_ghostPiece{ nullptr };
 
     ::std::unique_ptr<EventSystem> m_eventSystem{ nullptr };
-    ::std::shared_ptr<GridController> m_gridSystem{nullptr };
+    ::std::shared_ptr<GridController> m_gridSystem{ nullptr };
     ::std::shared_ptr<CollisionSystem> m_collisionSystem{ nullptr };
     ::std::shared_ptr<PieceController> m_pieceSystem{ nullptr };
     ::std::shared_ptr<TileController> m_tileSystem{ nullptr };

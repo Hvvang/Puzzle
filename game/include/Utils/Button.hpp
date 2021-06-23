@@ -47,7 +47,7 @@ public:
     }
 
     void deactivate() {
-        m_instance->activate();
+        m_instance->deactivate();
     }
 
 private:

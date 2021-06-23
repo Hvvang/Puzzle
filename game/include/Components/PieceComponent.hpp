@@ -19,13 +19,27 @@ using ::Engine::Math::operator+;
 struct PieceComponent : Component {
 
     enum class Shape : uint8_t {
-        I = 'I', O = 'O', J = 'J', L = 'L', T = 'T', Z = 'Z', S = 'S'
+        I = 73, O = 79, J = 74, L = 76, T = 84, Z = 90, S = 83
     } shape;
 
     PieceComponent() {
         for (auto &tile : tiles) {
             tile = ::std::make_unique<Entity>(entityManager->createEntity());
             tile->addComponent<TileComponent>();
+        }
+    }
+
+    void activate() {
+        for (auto &tile : tiles) {
+            tile->activate();
+            tile->getComponent<TileComponent>().instance->activate();
+        }
+    }
+
+    void deactivate() {
+        for (auto &tile : tiles) {
+            tile->deactivate();
+            tile->getComponent<TileComponent>().instance->deactivate();
         }
     }
 

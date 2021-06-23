@@ -137,3 +137,34 @@ void GridController::resetBoard() {
         }
     }
 }
+
+void GridController::activate() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &board = entity.getComponent<BoardComponent>();
+
+        for (auto row = 0; row < ROWS; ++row) {
+            for (auto col = 0; col < COLS; ++col) {
+                auto &tile = board.m_grid[row][col]->tile;
+                if (tile)
+                    tile->instance->activate();
+            }
+        }
+    }
+}
+
+void GridController::deactivate() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &board = entity.getComponent<BoardComponent>();
+
+        for (auto row = 0; row < ROWS; ++row) {
+            for (auto col = 0; col < COLS; ++col) {
+                auto &tile = board.m_grid[row][col]->tile;
+                if (tile)
+                    tile->instance->deactivate();
+            }
+        }
+    }
+}
+

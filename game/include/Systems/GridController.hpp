@@ -21,6 +21,9 @@ public:
 
     void resetBoard();
 
+    void activate();
+    void deactivate();
+
 private:
 
     void occupyPos(const Vector2i &pos, TileComponent *target);

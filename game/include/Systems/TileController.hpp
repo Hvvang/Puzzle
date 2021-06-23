@@ -23,6 +23,9 @@ public:
     void updateColor(TileComponent &tile, const ::MiniKit::Graphics::Color &color);
     void rotate(TileComponent &tile, const Vector2i &origin, bool clockwise);
 
+    void activate(TileComponent &tile);
+    void deactivate(TileComponent &tile);
+
 private:
     GameController *m_parent = { nullptr };
 

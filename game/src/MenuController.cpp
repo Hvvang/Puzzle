@@ -33,9 +33,11 @@ void MenuController::update(float) {
         switch (currentPage) {
             case Menu::NewGame:
                 m_parent->ChangeState();
+                open = false;
                 break;
             case Menu::Resume:
                 m_parent->ChangeState();
+                open = false;
                 break;
             case Menu::SettingsMenu:
                 ::ImGui::Begin("Settings", NULL,
@@ -86,6 +88,7 @@ void MenuController::KeyDown(Window &window, const KeyEvent &event) noexcept {
 }
 
 void MenuController::deactivate() {
+    m_context.GetWindow().RemoveResponder(*this);
     m_background->deactivate();
     for (auto &button : m_menuButtons) {
         button->deactivate();
@@ -93,6 +96,7 @@ void MenuController::deactivate() {
 }
 
 void MenuController::activate() {
+    m_context.GetWindow().AddResponder(*this);
     m_background->activate();
     for (auto &button : m_menuButtons) {
         button->activate();

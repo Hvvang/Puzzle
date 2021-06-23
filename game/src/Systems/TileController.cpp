@@ -46,6 +46,14 @@ void TileController::rotate(TileComponent &tile, const Vector2i &origin, bool cl
         updatePosition(tile, newPos);
 }
 
+void TileController::activate(TileComponent &tile) {
+    tile.instance->activate();
+}
+
+void TileController::deactivate(TileComponent &tile) {
+    tile.instance->deactivate();
+}
+
 
 
 

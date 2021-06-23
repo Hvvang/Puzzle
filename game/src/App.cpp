@@ -21,7 +21,6 @@
 }
 
 ::std::error_code App::Shutdown(MiniKit::Engine::Context &context) noexcept {
-    context.GetWindow().RemoveResponder(*m_menuManager);
     return ::MiniKit::MakeErrorCode(::MiniKit::Error::None);
 }
 
@@ -50,14 +49,15 @@ void App::ChangeState() {
 
     if (m_currentState == State::Menu) {
         m_menuManager->deactivate();
-        m_gameManager->activate();
         if (m_menuManager->currentPage == MenuController::NewGame) {
-            m_gameManager->resetGame();
+            m_gameManager->NewGameState();
+        } else {
+            m_gameManager->ResumeGameState();
         }
-        else if (m_menuManager->currentPage == MenuController::Resume) {
 
-        }
+    } else {
+        m_gameManager->deactivate();
+        m_menuManager->activate();
     }
-
     m_currentState = m_currentState == State::Menu ? State::Game : State::Menu;
 }
