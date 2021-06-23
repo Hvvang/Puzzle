@@ -40,8 +40,9 @@ class GameController : public Responder  {
         Fall,
         ClearLine,
         PieceBlock,
-        Pause
-    } m_currentState{State::Spawn};
+        Pause,
+        Off
+    } m_currentState{State::Off};
 
 public:
     explicit GameController(App *parent, MiniKit::Engine::Context &context);
@@ -58,9 +59,12 @@ public:
     void NewGameState();
     void ResumeGameState();
 
+    bool hasGame() { return m_currentState != State::Off; }
+
 private:
     void spawnPiece();
     void updateNextPiece();
+    void updateGhostPiece();
 
     void KeyDown(Window &window, const KeyEvent &event) noexcept override;
 
@@ -82,6 +86,7 @@ private:
     ::std::shared_ptr<PieceController> m_pieceSystem{ nullptr };
     ::std::shared_ptr<TileController> m_tileSystem{ nullptr };
     ::std::shared_ptr<ScoreSystem> m_scoreSystem{ nullptr };
+
 
     friend class GridController;
     friend class CollisionSystem;

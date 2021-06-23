@@ -68,6 +68,13 @@ void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape sh
     setColor(piece, shape);
 }
 
+void PieceController::spawnGhost(PieceComponent &piece, const ::std::array<Vector2i, 4> &location) {
+    auto &tileSystem = m_parent->m_tileSystem;
+    for (unsigned i = 0; i < 4; ++i) {
+        tileSystem->updatePosition(piece.tiles[i]->getComponent<TileComponent>(), location[i], {5.f, 4.f});
+    }
+}
+
 ::std::array<Vector2i, 4> PieceController::getTilesPosition(const PieceComponent &piece) {
     ::std::array<Vector2i, 4> positions{};
     for (auto i = 0; i < 4; ++i) {
@@ -85,6 +92,7 @@ void PieceController::movePiece(PieceComponent &piece, const Vector2i &offset) {
 int Mod(int x, int m) {
     return (x % m + m) % m;
 }
+
 
 void PieceController::rotatePiece(PieceComponent &piece, MoveComponent &move, bool clockwise) {
 

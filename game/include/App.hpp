@@ -35,6 +35,8 @@ public:
 
     void ChangeState();
 
+    bool hasActiveGame();
+
 
 private:
     bool isGame = false;

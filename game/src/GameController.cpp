@@ -35,15 +35,16 @@ GameController::GameController(App *parent, MiniKit::Engine::Context &context) :
 
     m_currentPiece = ::std::make_unique<Entity>(entityManager->createEntity());
     m_nextPiece = ::std::make_unique<Entity>(entityManager->createEntity());
-//    m_ghostPiece = ::std::make_unique<Entity>(entityManager->createEntity());
+    m_ghostPiece = ::std::make_unique<Entity>(entityManager->createEntity());
     m_playField = ::std::make_unique<Entity>(entityManager->createEntity());
 
     m_playField->addComponent<BoardComponent>();
     m_playField->addComponent<ScoreComponent>();
     m_playField->addComponent<Sprite>();
 
-//    m_ghostPiece->addComponent<PieceComponent>();
     m_nextPiece->addComponent<PieceComponent>();
+
+    m_ghostPiece->addComponent<PieceComponent>();
 
     initPlayFieldBackground();
 
@@ -87,43 +88,62 @@ void GameController::updatePieces(BlockSetEvent *) {
     }
     spawnPiece();
     updateNextPiece();
+    updateGhostPiece();
+}
+
+uint8_t translateIndex(int index) {
+    switch (index) {
+        case 0:
+            return 73;
+        case 1:
+            return 79;
+        case 2:
+            return 74;
+        case 3:
+            return 76;
+        case 4:
+            return 84;
+        case 5:
+            return 90;
+        case 6:
+            return 83;
+    }
 }
 
 void GameController::updateNextPiece() {
-    uint8_t shapeIndex = 0;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> distribution(0, 6);
-    switch (distribution(gen)) {
-        case 0:
-            shapeIndex = 73;
-            break;
-        case 1:
-            shapeIndex = 79;
-            break;
-        case 2:
-            shapeIndex = 74;
-            break;
-        case 3:
-            shapeIndex = 76;
-            break;
-        case 4:
-            shapeIndex = 84;
-            break;
-        case 5:
-            shapeIndex = 90;
-            break;
-        case 6:
-            shapeIndex = 83;
-            break;
-    }
-    auto shape = static_cast<PieceComponent::Shape>(shapeIndex);
+
+    auto shape = static_cast<PieceComponent::Shape>(translateIndex(distribution(gen)));
 
     auto &pieceComponent = m_nextPiece->getComponent<PieceComponent>();
     m_pieceSystem->spawnPiece(pieceComponent, shape, {11, 6}, {16.f, 4.f});
     pieceComponent.activate();
 }
 
+void GameController::updateGhostPiece() {
+    auto &pieceComponent = m_ghostPiece->getComponent<PieceComponent>();
+    pieceComponent.activate();
+    bool isPossible = true;
+    auto row = 0;
+    auto currentPiecePos = m_pieceSystem->getTilesPosition(m_currentPiece->getComponent<PieceComponent>());
+
+    for (; row < 20 && isPossible; ++row) {
+        for (auto pos : currentPiecePos) {
+            pos.y += row;
+            if (!m_gridSystem->isInBounds(pos) || !m_gridSystem->isPosEmpty(pos)) {
+                ::std::clog << "Y: " << pos.y << ::std::endl;
+                isPossible = false;
+                break;
+            }
+        }
+    }
+    for (auto &pos : currentPiecePos) {
+        pos.y += (row - 2);
+    }
+    m_pieceSystem->spawnGhost(pieceComponent, currentPiecePos);
+}
 
 void GameController::spawnPiece() {
     m_currentPiece = ::std::make_unique<Entity>(entityManager->createEntity());
@@ -142,6 +162,7 @@ void GameController::spawnPiece() {
 void GameController::update(float deltaTime) {
     if (m_currentState != State::Pause) {
         m_pieceSystem->update(deltaTime);
+        updateGhostPiece();
         m_collisionSystem->update(deltaTime);
         m_gridSystem->update(deltaTime);
         m_scoreSystem->update(deltaTime);
@@ -150,18 +171,20 @@ void GameController::update(float deltaTime) {
 
 
 void GameController::activate() {
+    m_currentState = State::Fall;
     m_context.GetWindow().AddResponder(*this);
     m_context.GetWindow().AddResponder(*m_pieceSystem);
 
     m_playField->activate();
 
     m_nextPiece->activate();
+    m_ghostPiece->activate();
 
     m_playField->getComponent<ScoreComponent>().activate();
 
     entityManager->refresh();
 
-//    m_ghostPiece->activate();
+    m_gridSystem->activate();
 }
 
 void GameController::deactivate() {
@@ -173,10 +196,12 @@ void GameController::deactivate() {
     m_scoreSystem->deactivate();
     m_currentPiece->deactivate();
     m_nextPiece->deactivate();
+    m_ghostPiece->deactivate();
 
     m_playField->getComponent<ScoreComponent>().deactivate();
     m_currentPiece->getComponent<PieceComponent>().deactivate();
     m_nextPiece->getComponent<PieceComponent>().deactivate();
+    m_ghostPiece->getComponent<PieceComponent>().deactivate();
 //    m_ghostPiece->deactivate();
     entityManager->refresh();
 }
@@ -186,16 +211,12 @@ void GameController::NewGameState() {
     activate();
     m_gridSystem->resetBoard();
     m_scoreSystem->resetScore();
-    m_gridSystem->activate();
-    m_scoreSystem->activate();
     updateNextPiece();
     updatePieces();
 }
 
 void GameController::ResumeGameState() {
     activate();
-    m_gridSystem->activate();
-    m_scoreSystem->activate();
     m_currentPiece->activate();
     m_currentPiece->getComponent<PieceComponent>().activate();
     m_nextPiece->getComponent<PieceComponent>().activate();

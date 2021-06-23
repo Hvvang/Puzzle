@@ -69,6 +69,9 @@ void MenuController::KeyDown(Window &window, const KeyEvent &event) noexcept {
                 if (currentPage > Menu::NewGame && !open) {
                     m_menuButtons.at(currentPage)->setState(false);
                     currentPage = static_cast<Menu>(currentPage - 1);
+                    if (currentPage == Menu::Resume && !m_parent->hasActiveGame()) {
+                        currentPage = static_cast<Menu>(currentPage - 1);
+                    }
                     m_menuButtons.at(currentPage)->setState(true);
                 }
                 break;
@@ -76,6 +79,9 @@ void MenuController::KeyDown(Window &window, const KeyEvent &event) noexcept {
                 if (currentPage < Menu::Quit && !open) {
                     m_menuButtons.at(currentPage)->setState(false);
                     currentPage = static_cast<Menu>(currentPage + 1);
+                    if (currentPage == Menu::Resume && !m_parent->hasActiveGame()) {
+                        currentPage = static_cast<Menu>(currentPage + 1);
+                    }
                     m_menuButtons.at(currentPage)->setState(true);
                 }
                 break;

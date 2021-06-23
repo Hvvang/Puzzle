@@ -46,7 +46,6 @@ void App::Tick(MiniKit::Engine::Context &context) noexcept {
 }
 
 void App::ChangeState() {
-
     if (m_currentState == State::Menu) {
         m_menuManager->deactivate();
         if (m_menuManager->currentPage == MenuController::NewGame) {
@@ -60,4 +59,8 @@ void App::ChangeState() {
         m_menuManager->activate();
     }
     m_currentState = m_currentState == State::Menu ? State::Game : State::Menu;
+}
+
+bool App::hasActiveGame() {
+    return m_gameManager->hasGame();
 }
