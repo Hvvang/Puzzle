@@ -25,12 +25,9 @@ struct TileComponent : Component {
         spriteComponent.getColor() = color;
         spriteComponent.getTransform().scale = {TileX * 2.f / static_cast<float>(spriteComponent.getTileRect().size.x),
                                                 TileY * 2.f / static_cast<float>(spriteComponent.getTileRect().size.y)};
-        instance->activate();
     }
 
 private:
-    bool active = true;
-
     ::std::unique_ptr<Entity> instance{ nullptr };
 
     Vector2i position;
@@ -39,4 +36,5 @@ private:
     friend class GridController;
     friend class TileController;
     friend class PieceController;
+    friend class PieceComponent;
 };

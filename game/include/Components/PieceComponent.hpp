@@ -19,37 +19,33 @@ using ::Engine::Math::operator+;
 struct PieceComponent : Component {
 
     enum class Shape : uint8_t {
-        I, O, J, L, T, Z, S
+        I = 73, O = 79, J = 74, L = 76, T = 84, Z = 90, S = 83
     } shape;
 
-    enum State : uint8_t {
-        MoveLeft = 0x1,
-        MoveRight = 0x2,
-        MoveDown = 0x4,
-        SoftDownMove = 0x8,
-        HardDownMove = 0x10,
-        RotateLeft = 0x20,
-        RotateRight = 0x40,
-    } state;
-
-    struct Data {
-        State state;
-        int rotationIndex;
-    } previousData;
-
-    PieceComponent() : state(State::MoveDown) {
+    PieceComponent() {
         for (auto &tile : tiles) {
             tile = ::std::make_unique<Entity>(entityManager->createEntity());
             tile->addComponent<TileComponent>();
         }
     }
 
+    void activate() {
+        for (auto &tile : tiles) {
+            tile->activate();
+            tile->getComponent<TileComponent>().instance->activate();
+        }
+    }
+
+    void deactivate() {
+        for (auto &tile : tiles) {
+            tile->deactivate();
+            tile->getComponent<TileComponent>().instance->deactivate();
+        }
+    }
 
 private:
     ::std::array<::std::unique_ptr<Entity>, 4> tiles{ nullptr };
-
-    int rotationIndex{0};
-    float m_speed = 0.6f;
+    Color color {0.1, 0.1, 0.1};
 
     friend class PieceController;
     friend class CollisionSystem;

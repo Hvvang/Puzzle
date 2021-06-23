@@ -20,11 +20,17 @@ void TileController::move(TileComponent &tile, const Vector2i &offset) {
     updatePosition(tile, tile.position + offset);
 }
 
-void TileController::updatePosition(TileComponent &tile, const Vector2i &pos) {
+void TileController::updatePosition(TileComponent &tile, const Vector2i &pos, const Vector2f &boardOffset) {
     tile.position = pos;
     auto &spriteComponent = tile.instance->getComponent<Sprite>();
-    spriteComponent.getTransform().position = {5.f + (pos.x) * (TileX + OffsetX),
-                                               4.f + (pos.y) * (TileY + OffsetY)};
+    spriteComponent.getTransform().position = {boardOffset.x + (pos.x) * (TileX + OffsetX),
+                                               boardOffset.y + (pos.y) * (TileY + OffsetY)};
+}
+
+void TileController::updateColor(TileComponent &tile, const Color &color) {
+    tile.color = color;
+    auto &spriteComponent = tile.instance->getComponent<Sprite>();
+    spriteComponent.getColor() = color;
 }
 
 void TileController::rotate(TileComponent &tile, const Vector2i &origin, bool clockwise) {
@@ -39,6 +45,16 @@ void TileController::rotate(TileComponent &tile, const Vector2i &origin, bool cl
         newPos += origin;
         updatePosition(tile, newPos);
 }
+
+void TileController::activate(TileComponent &tile) {
+    tile.instance->activate();
+}
+
+void TileController::deactivate(TileComponent &tile) {
+    tile.instance->deactivate();
+}
+
+
 
 
 

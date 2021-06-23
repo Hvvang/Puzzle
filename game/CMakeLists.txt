@@ -9,9 +9,13 @@ set(Puzzle_SOURCES
         src/Systems/TileController.cpp
         src/Systems/PieceController.cpp
         src/Systems/CollisionSystem.cpp
+        src/Systems/ScoreSystem.cpp
 
+        src/MenuController.cpp
         src/GameController.cpp
 
+        src/Font/Font.cpp
+        src/Font/Text.cpp
 
         )
 
@@ -20,24 +24,37 @@ set(Puzzle_HEADERS
 
         include/Components/PieceComponent.hpp
 
+        include/Components/ScoreComponent.hpp
         include/Components/TileComponent.hpp
         include/Components/BoardComponent.hpp
+        include/Components/MoveComponent.hpp
         include/Components/PieceCollisionComponent.hpp
 
         include/Systems/GridController.hpp
         include/Systems/PieceController.hpp
         include/Systems/TileController.hpp
         include/Systems/CollisionSystem.hpp
+        include/Systems/ScoreSystem.hpp
+
+        include/GameController.hpp
+        include/MenuController.hpp
 
         include/Event/Event.hpp
         include/Event/BaseHandlerFunction.hpp
         include/Event/HandlerFunction.hpp
         include/Event/EventSystem.hpp
+        include/Event/GameEvents.hpp
 
-        include/GameController.hpp
+        include/Font/Glyph.hpp
+        include/Font/Font.hpp
+        include/Font/Text.hpp
+        include/Font/TextRenderer.hpp
 
+        include/Utils/Button.hpp
 
-        include/GameEvents.hpp)
+        include/StateMachines/StateMachine.hpp
+
+        src/Settings.cpp include/Settings.hpp)
 
 
 add_executable(${PROJECT_NAME}
@@ -70,6 +87,8 @@ target_link_libraries(${PROJECT_NAME}
         Engine::ECS
         Engine::Input
         Engine::View
+
+        nlohmann_json::nlohmann_json
         )
 
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/..")

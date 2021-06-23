@@ -6,7 +6,9 @@
 
 #include <GameController.hpp>
 
-#include <GameEvents.hpp>
+#include <Event/GameEvents.hpp>
+
+#include <Components/MoveComponent.hpp>
 
 using ::Engine::Math::operator-;
 
@@ -14,36 +16,33 @@ void CollisionSystem::update(float) {
     auto colliders = getEntities();
     for (auto &collider : colliders) {
         auto &piece = collider.getComponent<PieceComponent>();
+        auto &moveComponent = collider.getComponent<MoveComponent>();
         auto &collision = collider.getComponent<PieceCollisionComponent>();
 
-        if (piece.state & PieceComponent::State::RotateRight
-            || piece.state & PieceComponent::State::RotateLeft) {
+        if (moveComponent.state & (MoveComponent::State::RotateRight | MoveComponent::State::RotateLeft)) {
             Vector2i endOffset{0, 0};
-            bool clockwise = piece.state & PieceComponent::State::RotateRight;
+            bool clockwise = moveComponent.state & MoveComponent::State::RotateRight;
 
-            if (!checkOffset(piece, collision, piece.previousData.rotationIndex, piece.rotationIndex, endOffset)) {
-                m_parent->m_pieceSystem->rotatePiece(piece, !clockwise);
+            if (!checkOffset(piece, collision, moveComponent.previousData.rotationIndex,
+                             moveComponent.rotationIndex, endOffset)) {
+                m_parent->m_pieceSystem->rotatePiece(piece, moveComponent, !clockwise);
             } else {
                 m_parent->m_pieceSystem->movePiece(piece, endOffset);
             }
         }
-        if (!checkMovePiece(m_parent->m_pieceSystem->getTilesPosition(piece), {0, 0})
-            && (piece.state & PieceComponent::State::MoveRight
-            || piece.state & PieceComponent::State::MoveLeft)) {
-            bool isRightMove = (piece.state & PieceComponent::State::MoveRight);
-            bool isLeftMove = (piece.state & PieceComponent::State::MoveLeft);
-            auto backOffset = Vector2i{-isRightMove + isLeftMove, 0};
+        else if (!checkMovePiece(m_parent->m_pieceSystem->getTilesPosition(piece), {0, 0})) {
+            if (moveComponent.state & (MoveComponent::State::MoveRight | MoveComponent::State::MoveLeft)) {
+                bool isRightMove = (moveComponent.state & MoveComponent::State::MoveRight);
+                bool isLeftMove = (moveComponent.state & MoveComponent::State::MoveLeft);
+                auto backOffset = Vector2i{-isRightMove + isLeftMove, 0};
 
-            m_parent->m_pieceSystem->movePiece(piece, backOffset);
+                m_parent->m_pieceSystem->movePiece(piece, backOffset);
+            } else {
+                m_parent->m_pieceSystem->movePiece(piece, {0, -1});
+                m_parent->m_eventSystem->emit(new SoftDropCollidedEvent());
+                m_parent->m_eventSystem->emit(new BlockSetEvent());
+            }
         }
-        if (!checkMovePiece(m_parent->m_pieceSystem->getTilesPosition(piece), {0, 0})
-            && (piece.state & PieceComponent::State::MoveDown
-            || piece.state & PieceComponent::State::SoftDownMove)) {
-            m_parent->m_pieceSystem->movePiece(piece, {0, -1});
-
-            m_parent->m_eventSystem->emit(new BlockSetEvent());
-        }
-
     }
 }
 

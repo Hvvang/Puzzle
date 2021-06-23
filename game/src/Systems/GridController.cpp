@@ -43,15 +43,26 @@ void GridController::moveTileDown(const Vector2i &pos) {
 
         if (board.m_grid[pos.y][pos.x]->isOccupied) {
             occupyPos({pos.x, pos.y + 1}, board.m_grid[pos.y][pos.x]->tile);
+            m_parent->m_tileSystem->updatePosition(*board.m_grid[pos.y][pos.x]->tile, {pos.x, pos.y + 1});
             deOccupyPos(pos);
         }
     }
 }
 
 void GridController::removeTilesInRow(int row) {
-    for (auto col = 0; col < COLS; ++col) {
-        deOccupyPos({col, row});
-        moveTileDown({col, row - 1});
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &board = entity.getComponent<BoardComponent>();
+
+        for (auto col = 0; col < COLS; ++col) {
+            board.m_grid[row][col]->tile->instance->erase();
+            deOccupyPos({col, row});
+        }
+        for (auto r = row - 1; r >= 0; --r) {
+            for (auto col = 0; col < COLS; ++col) {
+                moveTileDown({col, r});
+            }
+        }
     }
 }
 
@@ -84,6 +95,7 @@ void GridController::clearLines() {
     for (auto &lineIndex : m_linesToClear) {
         removeTilesInRow(lineIndex);
     }
+    m_parent->m_eventSystem->emit(new LinesClearEvent(m_linesToClear));
     m_linesToClear.clear();
 }
 
@@ -103,10 +115,56 @@ bool GridController::isPosEmpty(const Vector2i &pos) {
 }
 
 void GridController::onBlockSetEvent(BlockSetEvent *) {
-    auto &piece = m_parent->m_currentPiece.getComponent<PieceComponent>();
+    auto &piece = m_parent->m_currentPiece->getComponent<PieceComponent>();
 
     for (auto &tile : piece.tiles) {
         auto &component = tile->getComponent<TileComponent>();
         occupyPos(component.position, &component);
     }
+    checkLinesToClear();
+    clearLines();
 }
+
+void GridController::resetBoard() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &board = entity.getComponent<BoardComponent>();
+
+        for (auto row = 0; row < ROWS; ++row) {
+            for (auto col = 0; col < COLS; ++col) {
+                board.m_grid[row][col] = ::std::make_unique<BoardBlock>(Vector2i{row, col});
+            }
+        }
+    }
+}
+
+void GridController::activate() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &board = entity.getComponent<BoardComponent>();
+
+        for (auto row = 0; row < ROWS; ++row) {
+            for (auto col = 0; col < COLS; ++col) {
+                auto &tile = board.m_grid[row][col]->tile;
+                if (tile)
+                    tile->instance->activate();
+            }
+        }
+    }
+}
+
+void GridController::deactivate() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &board = entity.getComponent<BoardComponent>();
+
+        for (auto row = 0; row < ROWS; ++row) {
+            for (auto col = 0; col < COLS; ++col) {
+                auto &tile = board.m_grid[row][col]->tile;
+                if (tile)
+                    tile->instance->deactivate();
+            }
+        }
+    }
+}
+
