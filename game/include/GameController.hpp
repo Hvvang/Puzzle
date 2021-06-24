@@ -100,4 +100,6 @@ private:
     uint8_t getHardDropDistance();
 
     void onPieceFallen(PieceFallenEvent *);
+
+    void onGameOver(GameOverEvent *);
 };

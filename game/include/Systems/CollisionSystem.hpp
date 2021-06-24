@@ -30,4 +30,6 @@ private:
 
 private:
     GameController *m_parent = { nullptr };
+
+    friend class GameController;
 };

@@ -24,10 +24,14 @@ GameController::GameController(App *parent, MiniKit::Engine::Context &context) :
     m_tileSystem = ::std::make_shared<TileController>(this);
     m_scoreSystem = ::std::make_shared<ScoreSystem>(this);
 
-    SpriteManager->loadSprite("assets/images/background_b.png", "playField");
+    SpriteManager->loadSprite("assets/images/background_b.png", "playField_0");
+    SpriteManager->loadSprite("assets/images/background_g.png", "playField_1");
+    SpriteManager->loadSprite("assets/images/background_p.png", "playField_2");
+    SpriteManager->loadSprite("assets/images/info_b.png", "info_0");
+    SpriteManager->loadSprite("assets/images/info_g.png", "info_1");
+    SpriteManager->loadSprite("assets/images/info_p.png", "info_2");
     SpriteManager->loadSprite("assets/images/square.png", "square");
     SpriteManager->loadSprite("assets/images/pause.png", "pause");
-    SpriteManager->loadSprite("assets/images/info_b.png", "info");
 
     entityManager->addSystem(*m_gridSystem);
     entityManager->addSystem(*m_collisionSystem);
@@ -43,20 +47,20 @@ GameController::GameController(App *parent, MiniKit::Engine::Context &context) :
 
     m_playField = ::std::make_unique<Entity>(entityManager->createEntity());
 
-    m_pauseLabel->addComponent<Sprite>();
-    m_controlInfoLabel->addComponent<Sprite>();
+    m_pauseLabel->addComponent<Sprite>().getTransform().scale *= 2.f;
+    m_controlInfoLabel->addComponent<Sprite>().getTransform().scale *= 2.5f;
 
     m_playField->addComponent<BoardComponent>();
     m_playField->addComponent<ScoreComponent>();
-    m_playField->addComponent<Sprite>();
+    m_playField->addComponent<Sprite>().getTransform().scale *= 2.f;
 
     m_ghostPiece->addComponent<PieceComponent>();
     m_nextPiece->addComponent<PieceComponent>();
 
-    initPlayFieldBackground();
 
     m_eventSystem->connect(this, &GameController::updatePieces);
     m_eventSystem->connect(this, &GameController::onPieceFallen);
+    m_eventSystem->connect(this, &GameController::onGameOver);
 }
 
 GameController::~GameController() {
@@ -76,6 +80,10 @@ void GameController::onPieceFallen(PieceFallenEvent *) {
             m_eventSystem->emit(new BlockSetEvent);
         }
     }
+}
+
+void GameController::onGameOver(GameOverEvent *) {
+    m_parent->ChangeState();
 }
 
 void GameController::KeyDown(Window &window, const KeyEvent &event) noexcept {
@@ -113,18 +121,15 @@ void GameController::KeyDown(Window &window, const KeyEvent &event) noexcept {
 void GameController::initPlayFieldBackground() {
     auto &playFieldSprite = m_playField->getComponent<Sprite>();
 
-    playFieldSprite.setImage("playField");
-    playFieldSprite.getTransform().scale *= 2.f;
+    playFieldSprite.setImage("playField_" + ::std::to_string(int(settings->getValue("Theme"))));
 
     auto &pauseLabelSprite = m_pauseLabel->getComponent<Sprite>();
     pauseLabelSprite.setImage("pause");
-    pauseLabelSprite.getTransform().position.y += m_context.GetWindow().GetHeight() / 5;
-    pauseLabelSprite.getTransform().scale *= 2.f;
+    pauseLabelSprite.getTransform().position.y = m_context.GetWindow().GetHeight() / 5;
 
     auto &infoLabelSprite = m_controlInfoLabel->getComponent<Sprite>();
-    infoLabelSprite.setImage("info");
+    infoLabelSprite.setImage("info_" + ::std::to_string(int(settings->getValue("Theme"))));
     infoLabelSprite.getTransform().position = {m_context.GetWindow().GetWidth() / 4.f, m_context.GetWindow().GetHeight() / 4.f};
-    infoLabelSprite.getTransform().scale *= 2.5f;
 }
 
 void GameController::updatePieces(BlockSetEvent *) {
@@ -205,6 +210,9 @@ void GameController::spawnPiece() {
     m_currentPiece->addComponent<MoveComponent>();
 
     m_pieceSystem->spawnPiece(pieceComponent, shape, m_gridSystem->m_spawnLocation);
+    if (!m_collisionSystem->checkMovePiece(m_pieceSystem->getTilesPosition(pieceComponent), {0, 1})) {
+        m_eventSystem->emit(new GameOverEvent());
+    }
     m_currentPiece->activate();
 }
 
@@ -224,6 +232,7 @@ void GameController::activate() {
     m_context.GetWindow().AddResponder(*m_pieceSystem);
 
     m_playField->activate();
+    initPlayFieldBackground();
 
     m_nextPiece->activate();
 
@@ -267,7 +276,6 @@ void GameController::NewGameState() {
 
 void GameController::ResumeGameState() {
     activate();
-
     m_currentPiece->activate();
     m_currentPiece->getComponent<PieceComponent>().activate();
     m_nextPiece->getComponent<PieceComponent>().activate();

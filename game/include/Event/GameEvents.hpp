@@ -19,3 +19,4 @@ struct LinesClearEvent : Event {
 
 struct LevelUpEvent : Event{};
 struct PieceFallenEvent : Event{};
+struct GameOverEvent : Event{};

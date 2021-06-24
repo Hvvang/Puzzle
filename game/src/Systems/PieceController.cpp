@@ -49,10 +49,8 @@ void PieceController::update(float deltaTime) {
     }
 }
 
-void PieceController::setColor(PieceComponent &piece, PieceComponent::Shape shape) {
-    json _json_color = settings->getValue("Tetrominos")[::std::string(1, static_cast<char>(shape))].at(1)["Color"];
-    Color color = {_json_color.at(0), _json_color.at(1), _json_color.at(2), _json_color.at(3)};
 
+void PieceController::setColor(PieceComponent &piece, const Color &color) {
     for (auto i = 0u; i < 4; ++i) {
         m_parent->m_tileSystem->updateColor(piece.tiles[i]->getComponent<TileComponent>(), color);
     }
@@ -68,7 +66,11 @@ void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape sh
         int y = _json_shape.at(i).at(1);
         tileSystem->updatePosition(piece.tiles[i]->getComponent<TileComponent>(), spawnLocation + Vector2i({x, y}), boardOffset);
     }
-    setColor(piece, shape);
+
+    json _json_color = settings->getValue("Tetrominos")[::std::string(1, static_cast<char>(shape))].at(1)["Color"];
+    Color color = {_json_color.at(0), _json_color.at(1), _json_color.at(2), _json_color.at(3)};
+
+    setColor(piece, color);
 }
 
 void PieceController::spawnGhost(PieceComponent &piece, const ::std::array<Vector2i, 4> &location) {
@@ -76,6 +78,9 @@ void PieceController::spawnGhost(PieceComponent &piece, const ::std::array<Vecto
     for (unsigned i = 0; i < 4; ++i) {
         tileSystem->updatePosition(piece.tiles[i]->getComponent<TileComponent>(), location[i], {5.f, 4.f});
     }
+    json _json_color = settings->getValue("Ghost color");
+    Color color = {_json_color.at(0), _json_color.at(1), _json_color.at(2), _json_color.at(3)};
+    setColor(piece, color);
 }
 
 ::std::array<Vector2i, 4> PieceController::getTilesPosition(const PieceComponent &piece) {
