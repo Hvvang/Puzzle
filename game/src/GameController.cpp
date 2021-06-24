@@ -11,7 +11,7 @@
 
 #include <random>
 #include <App.hpp>
-
+#include <Settings.hpp>
 
 using ::Engine::Math::operator*=;
 
@@ -26,6 +26,8 @@ GameController::GameController(App *parent, MiniKit::Engine::Context &context) :
 
     SpriteManager->loadSprite("assets/images/background_b.png", "playField");
     SpriteManager->loadSprite("assets/images/square.png", "square");
+    SpriteManager->loadSprite("assets/images/pause.png", "pause");
+    SpriteManager->loadSprite("assets/images/info_b.png", "info");
 
     entityManager->addSystem(*m_gridSystem);
     entityManager->addSystem(*m_collisionSystem);
@@ -33,27 +35,47 @@ GameController::GameController(App *parent, MiniKit::Engine::Context &context) :
     entityManager->addSystem(*m_tileSystem);
     entityManager->addSystem(*m_scoreSystem);
 
+    m_controlInfoLabel = ::std::make_unique<Entity>(entityManager->createEntity());
+    m_pauseLabel = ::std::make_unique<Entity>(entityManager->createEntity());
+    m_ghostPiece = ::std::make_unique<Entity>(entityManager->createEntity());
     m_currentPiece = ::std::make_unique<Entity>(entityManager->createEntity());
     m_nextPiece = ::std::make_unique<Entity>(entityManager->createEntity());
-    m_ghostPiece = ::std::make_unique<Entity>(entityManager->createEntity());
+
     m_playField = ::std::make_unique<Entity>(entityManager->createEntity());
+
+    m_pauseLabel->addComponent<Sprite>();
+    m_controlInfoLabel->addComponent<Sprite>();
 
     m_playField->addComponent<BoardComponent>();
     m_playField->addComponent<ScoreComponent>();
     m_playField->addComponent<Sprite>();
 
-    m_nextPiece->addComponent<PieceComponent>();
-
     m_ghostPiece->addComponent<PieceComponent>();
+    m_nextPiece->addComponent<PieceComponent>();
 
     initPlayFieldBackground();
 
     m_eventSystem->connect(this, &GameController::updatePieces);
+    m_eventSystem->connect(this, &GameController::onPieceFallen);
 }
 
 GameController::~GameController() {
 //    m_context.GetWindow().RemoveResponder(*m_pieceSystem);
 //    m_context.GetWindow().RemoveResponder(*this);
+}
+
+void GameController::onPieceFallen(PieceFallenEvent *) {
+
+    if (m_currentState != State::PieceBlocking) {
+        m_currentState = State::PieceBlocking;
+        m_pieceBlockingTimer = ::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::system_clock::now().time_since_epoch());
+    } else {
+        auto currentTime = ::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::system_clock::now().time_since_epoch());
+        if (currentTime - m_pieceBlockingTimer > std::chrono::milliseconds(500)) {
+            m_currentState = State::Fall;
+            m_eventSystem->emit(new BlockSetEvent);
+        }
+    }
 }
 
 void GameController::KeyDown(Window &window, const KeyEvent &event) noexcept {
@@ -62,10 +84,23 @@ void GameController::KeyDown(Window &window, const KeyEvent &event) noexcept {
     if (now - inputDelay > std::chrono::milliseconds(130)) {
         switch (event.keycode) {
             case MiniKit::Platform::Keycode::KeyP:
-                if (m_currentState != State::Pause)
+                if (m_currentState != State::Pause) {
                     m_currentState = State::Pause;
-                else
+                    m_pauseLabel->activate();
+                }
+                else {
+                    m_pauseLabel->deactivate();
                     m_currentState = State::Fall;
+                }
+                break;
+            case MiniKit::Platform::Keycode::KeyI:
+                if (m_controlInfoLabel->isActivated()) {
+                    m_controlInfoLabel->deactivate();
+                    m_pauseLabel->activate();
+                } else {
+                    m_currentState = State::Pause;
+                    m_controlInfoLabel->activate();
+                }
                 break;
             case MiniKit::Platform::Keycode::KeyQ:
                 m_parent->ChangeState();
@@ -80,6 +115,16 @@ void GameController::initPlayFieldBackground() {
 
     playFieldSprite.setImage("playField");
     playFieldSprite.getTransform().scale *= 2.f;
+
+    auto &pauseLabelSprite = m_pauseLabel->getComponent<Sprite>();
+    pauseLabelSprite.setImage("pause");
+    pauseLabelSprite.getTransform().position.y += m_context.GetWindow().GetHeight() / 5;
+    pauseLabelSprite.getTransform().scale *= 2.f;
+
+    auto &infoLabelSprite = m_controlInfoLabel->getComponent<Sprite>();
+    infoLabelSprite.setImage("info");
+    infoLabelSprite.getTransform().position = {m_context.GetWindow().GetWidth() / 4.f, m_context.GetWindow().GetHeight() / 4.f};
+    infoLabelSprite.getTransform().scale *= 2.5f;
 }
 
 void GameController::updatePieces(BlockSetEvent *) {
@@ -88,7 +133,6 @@ void GameController::updatePieces(BlockSetEvent *) {
     }
     spawnPiece();
     updateNextPiece();
-    updateGhostPiece();
 }
 
 uint8_t translateIndex(int index) {
@@ -124,7 +168,6 @@ void GameController::updateNextPiece() {
 
 void GameController::updateGhostPiece() {
     auto &pieceComponent = m_ghostPiece->getComponent<PieceComponent>();
-    pieceComponent.activate();
     bool isPossible = true;
     auto row = 0;
     auto currentPiecePos = m_pieceSystem->getTilesPosition(m_currentPiece->getComponent<PieceComponent>());
@@ -133,16 +176,22 @@ void GameController::updateGhostPiece() {
         for (auto pos : currentPiecePos) {
             pos.y += row;
             if (!m_gridSystem->isInBounds(pos) || !m_gridSystem->isPosEmpty(pos)) {
-                ::std::clog << "Y: " << pos.y << ::std::endl;
+                --row;
                 isPossible = false;
                 break;
             }
         }
     }
     for (auto &pos : currentPiecePos) {
-        pos.y += (row - 2);
+        pos.y += (row - 1);
     }
     m_pieceSystem->spawnGhost(pieceComponent, currentPiecePos);
+}
+
+uint8_t GameController::getHardDropDistance() {
+    auto &currentPiece = m_currentPiece->getComponent<PieceComponent>();
+    auto &ghostPiece = m_ghostPiece->getComponent<PieceComponent>();
+    return ghostPiece.tiles[0]->getComponent<TileComponent>().position.y - currentPiece.tiles[0]->getComponent<TileComponent>().position.y;
 }
 
 void GameController::spawnPiece() {
@@ -162,7 +211,6 @@ void GameController::spawnPiece() {
 void GameController::update(float deltaTime) {
     if (m_currentState != State::Pause) {
         m_pieceSystem->update(deltaTime);
-        updateGhostPiece();
         m_collisionSystem->update(deltaTime);
         m_gridSystem->update(deltaTime);
         m_scoreSystem->update(deltaTime);
@@ -178,13 +226,15 @@ void GameController::activate() {
     m_playField->activate();
 
     m_nextPiece->activate();
-    m_ghostPiece->activate();
 
-    m_playField->getComponent<ScoreComponent>().activate();
+    if (settings->getValue("Ghost piece")) {
+        m_ghostPiece->activate();
+        m_ghostPiece->getComponent<PieceComponent>().activate();
+    }
 
     entityManager->refresh();
-
     m_gridSystem->activate();
+    m_scoreSystem->activate();
 }
 
 void GameController::deactivate() {
@@ -202,7 +252,7 @@ void GameController::deactivate() {
     m_currentPiece->getComponent<PieceComponent>().deactivate();
     m_nextPiece->getComponent<PieceComponent>().deactivate();
     m_ghostPiece->getComponent<PieceComponent>().deactivate();
-//    m_ghostPiece->deactivate();
+
     entityManager->refresh();
 }
 
@@ -217,6 +267,7 @@ void GameController::NewGameState() {
 
 void GameController::ResumeGameState() {
     activate();
+
     m_currentPiece->activate();
     m_currentPiece->getComponent<PieceComponent>().activate();
     m_nextPiece->getComponent<PieceComponent>().activate();

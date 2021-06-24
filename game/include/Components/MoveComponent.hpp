@@ -34,5 +34,6 @@ struct MoveComponent : Component {
             {MoveRight, {1, 0}},
             {MoveDown, {0, 1}},
             {SoftDownMove, {0, 1}},
+            {HardDownMove, {0, 0}},
     };
 };

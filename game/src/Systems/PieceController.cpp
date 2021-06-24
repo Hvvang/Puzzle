@@ -23,14 +23,17 @@ void PieceController::update(float deltaTime) {
         moveComponent.previousData.rotationIndex = moveComponent.rotationIndex;
 
         if (moveTime > 0.2 && moveComponent.state &
-            (MoveComponent::State::MoveLeft | MoveComponent::State::MoveRight | MoveComponent::State::SoftDownMove)) {
+            (MoveComponent::State::MoveLeft | MoveComponent::State::MoveRight
+            | MoveComponent::State::SoftDownMove | MoveComponent::State::HardDownMove)) {
             moveComponent.previousData.state = moveComponent.state;
             movePiece(pieceComponent, moveComponent.direction[moveComponent.state]);
             moveTime = 0;
             if (moveComponent.state & MoveComponent::State::SoftDownMove) {
                 m_parent->m_eventSystem->emit(new SoftDropEvent());
             } else if (moveComponent.state & MoveComponent::State::HardDownMove) {
-                m_parent->m_eventSystem->emit(new SoftDropEvent());
+                auto offset = m_parent->getHardDropDistance();
+                movePiece(pieceComponent, {0, offset});
+                m_parent->m_eventSystem->emit(new HardDropEvent(offset));
             }
         } else if (moveTime > 0.2 && moveComponent.state & (MoveComponent::State::RotateLeft | MoveComponent::RotateRight)) {
             rotatePiece(pieceComponent, moveComponent, moveComponent.state & MoveComponent::RotateRight);

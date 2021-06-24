@@ -22,9 +22,9 @@ struct ScoreComponent : Component  {
         auto &scoreText = score->addComponent<Text>(::std::to_string(scr), *m_font, 7u);
         auto &linesText = lines->addComponent<Text>(::std::to_string(lns), *m_font, 7u);
 
-        levelText.getTransform().position = {580, 379};
-        scoreText.getTransform().position = {580, 458};
-        linesText.getTransform().position = {580, 537};
+        levelText.getTransform().position = {572, 379};
+        scoreText.getTransform().position = {572, 458};
+        linesText.getTransform().position = {572, 537};
 
         levelText.getColor() = {240.f / 255.f, 110.f / 255.f, 0.f, 1.f};
         scoreText.getColor() = {240.f / 255.f, 110.f / 255.f, 0.f, 1.f};

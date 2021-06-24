@@ -39,7 +39,7 @@ class GameController : public Responder  {
         Spawn,
         Fall,
         ClearLine,
-        PieceBlock,
+        PieceBlocking,
         Pause,
         Off
     } m_currentState{State::Off};
@@ -74,7 +74,10 @@ private:
 
     ::std::chrono::milliseconds now;
     ::std::chrono::milliseconds inputDelay{0};
+    ::std::chrono::milliseconds m_pieceBlockingTimer{0};
 
+    ::std::unique_ptr<Entity> m_pauseLabel{ nullptr };
+    ::std::unique_ptr<Entity> m_controlInfoLabel{ nullptr };
     ::std::unique_ptr<Entity> m_playField{ nullptr };
     ::std::unique_ptr<Entity> m_currentPiece{ nullptr };
     ::std::unique_ptr<Entity> m_nextPiece{ nullptr };
@@ -93,4 +96,8 @@ private:
     friend class PieceController;
     friend class TileController;
     friend class ScoreSystem;
+
+    uint8_t getHardDropDistance();
+
+    void onPieceFallen(PieceFallenEvent *);
 };

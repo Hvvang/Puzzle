@@ -4,6 +4,7 @@
 ScoreSystem::ScoreSystem(GameController *parent) : m_parent(parent) {
     m_parent->m_eventSystem->connect(this, &ScoreSystem::onLinesClear);
     m_parent->m_eventSystem->connect(this, &ScoreSystem::onSoftDrop);
+    m_parent->m_eventSystem->connect(this, &ScoreSystem::onHardDrop);
 }
 
 void ScoreSystem::update(float deltaTime) {
@@ -13,7 +14,11 @@ void ScoreSystem::update(float deltaTime) {
 
         score.level->getComponent<Text>().setText(::std::to_string(score.lvl));
         score.lines->getComponent<Text>().setText(::std::to_string(score.lns));
-        score.score->getComponent<Text>().setText(::std::to_string(score.scr));
+        if (score.scr > 99999) {
+            score.score->getComponent<Text>().setText(::std::to_string(score.scr / 1000000) + "K");
+        } else {
+            score.score->getComponent<Text>().setText(::std::to_string(score.scr));
+        }
     }
 }
 
@@ -24,7 +29,7 @@ void ScoreSystem::onLinesClear(LinesClearEvent *e) {
 
         int resScore = 0;
 
-        switch (e->lines.size()) {
+        switch (e->_lines.size()) {
             case 1:
                 resScore = 100; break;
             case 2:
@@ -36,8 +41,8 @@ void ScoreSystem::onLinesClear(LinesClearEvent *e) {
         }
 
         score.scr += resScore * score.lvl;
-        score.lns += e->lines.size();
-        m_clearLines += e->lines.size();
+        score.lns += e->_lines.size();
+        m_clearLines += e->_lines.size();
 
         if (m_clearLines >= 5 + (3 * (score.lvl - 1))) {
             score.lvl += 1;
@@ -52,6 +57,15 @@ void ScoreSystem::onSoftDrop(SoftDropEvent *e) {
         auto &score = entity.getComponent<ScoreComponent>();
 
         score.scr += 1;
+    }
+}
+
+void ScoreSystem::onHardDrop(HardDropEvent *e) {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &score = entity.getComponent<ScoreComponent>();
+
+        score.scr += e->_distance * 2;
     }
 }
 

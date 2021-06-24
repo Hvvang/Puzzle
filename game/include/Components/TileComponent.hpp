@@ -37,4 +37,5 @@ private:
     friend class TileController;
     friend class PieceController;
     friend class PieceComponent;
+    friend class GameController;
 };
