@@ -47,6 +47,7 @@ void ScoreSystem::onLinesClear(LinesClearEvent *e) {
         if (m_clearLines >= 5 + (3 * (score.lvl - 1))) {
             score.lvl += 1;
             m_clearLines = 0;
+            m_parent->m_eventSystem->emit(new LevelUpEvent);
         }
     }
 }

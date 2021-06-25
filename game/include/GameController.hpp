@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <EntityComponentSystem.hpp>
 #include "Font/Font.hpp"
 #include <Math.hpp>
@@ -18,10 +17,10 @@ class CollisionSystem;
 class PieceController;
 class TileController;
 class ScoreSystem;
+class AnimationSystem;
 
 namespace Engine::ECS {
     class Entity;
-
 }
 
 namespace MiniKit::Engine {
@@ -62,10 +61,16 @@ public:
 
     bool hasGame() { return m_currentState != State::Off; }
 
+    uint8_t getHardDropDistance();
+
 private:
     void spawnPiece();
     void updateNextPiece();
     void updateGhostPiece();
+
+    void onPieceFallen(PieceFallenEvent *);
+    void onGameOver(GameOverEvent *);
+    void onLevelUp(LevelUpEvent *);
 
     void KeyDown(Window &window, const KeyEvent &event) noexcept override;
 
@@ -77,6 +82,7 @@ private:
     ::std::chrono::milliseconds inputDelay{0};
     ::std::chrono::milliseconds m_pieceBlockingTimer{0};
 
+    ::std::unique_ptr<Entity> m_levelUpAnim{ nullptr };
     ::std::unique_ptr<Entity> m_pauseLabel{ nullptr };
     ::std::unique_ptr<Entity> m_gameOverLabel{ nullptr };
     ::std::unique_ptr<Entity> m_controlInfoLabel{ nullptr };
@@ -91,6 +97,7 @@ private:
     ::std::shared_ptr<PieceController> m_pieceSystem{ nullptr };
     ::std::shared_ptr<TileController> m_tileSystem{ nullptr };
     ::std::shared_ptr<ScoreSystem> m_scoreSystem{ nullptr };
+    ::std::shared_ptr<AnimationSystem> m_animationSystem{ nullptr };
 
 
     friend class GridController;
@@ -98,10 +105,4 @@ private:
     friend class PieceController;
     friend class TileController;
     friend class ScoreSystem;
-
-    uint8_t getHardDropDistance();
-
-    void onPieceFallen(PieceFallenEvent *);
-
-    void onGameOver(GameOverEvent *);
 };

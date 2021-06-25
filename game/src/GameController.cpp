@@ -8,6 +8,9 @@
 #include <Systems/PieceController.hpp>
 #include <Systems/TileController.hpp>
 #include <Systems/ScoreSystem.hpp>
+#include <Systems/AnimationSystem.hpp>
+
+#include <Components/AnimationComponent.hpp>
 
 #include <random>
 #include <App.hpp>
@@ -23,6 +26,7 @@ GameController::GameController(App *parent, MiniKit::Engine::Context &context) :
     m_pieceSystem = ::std::make_shared<PieceController>(this);
     m_tileSystem = ::std::make_shared<TileController>(this);
     m_scoreSystem = ::std::make_shared<ScoreSystem>(this);
+    m_animationSystem = ::std::make_shared<AnimationSystem>();
 
     SpriteManager->loadSprite("assets/images/background_b.png", "playField_0");
     SpriteManager->loadSprite("assets/images/background_g.png", "playField_1");
@@ -33,13 +37,20 @@ GameController::GameController(App *parent, MiniKit::Engine::Context &context) :
     SpriteManager->loadSprite("assets/images/square.png", "square");
     SpriteManager->loadSprite("assets/images/pause.png", "pause");
     SpriteManager->loadSprite("assets/images/gameOver.png", "gameOver");
+    SpriteManager->loadSprite("assets/images/LevelUp(0).png", "levelUp0");
+    SpriteManager->loadSprite("assets/images/LevelUp(1).png", "levelUp1");
+    SpriteManager->loadSprite("assets/images/LevelUp(2).png", "levelUp2");
+    SpriteManager->loadSprite("assets/images/LevelUp(3).png", "levelUp3");
+
 
     entityManager->addSystem(*m_gridSystem);
     entityManager->addSystem(*m_collisionSystem);
     entityManager->addSystem(*m_pieceSystem);
     entityManager->addSystem(*m_tileSystem);
     entityManager->addSystem(*m_scoreSystem);
+    entityManager->addSystem(*m_animationSystem);
 
+    m_levelUpAnim = ::std::make_unique<Entity>(entityManager->createEntity());
     m_controlInfoLabel = ::std::make_unique<Entity>(entityManager->createEntity());
     m_pauseLabel = ::std::make_unique<Entity>(entityManager->createEntity());
     m_gameOverLabel = ::std::make_unique<Entity>(entityManager->createEntity());
@@ -60,10 +71,21 @@ GameController::GameController(App *parent, MiniKit::Engine::Context &context) :
     m_ghostPiece->addComponent<PieceComponent>();
     m_nextPiece->addComponent<PieceComponent>();
 
+    auto &lvlAnim = m_levelUpAnim->addComponent<AnimationComponent>();
+    lvlAnim.addFrame("levelUp0");
+    lvlAnim.addFrame("levelUp1");
+    lvlAnim.addFrame("levelUp2");
+    lvlAnim.addFrame("levelUp3");
+    lvlAnim.animTime = ::std::chrono::milliseconds{2400};
+    lvlAnim.frameDuration = ::std::chrono::milliseconds{300};
+    lvlAnim.getTransform().position = {640, 351};
+    lvlAnim.getTransform().scale *= 0.2f;
+    lvlAnim.getColor() = {0.9f, 0.5f, 0.f, 1.f};
 
     m_eventSystem->connect(this, &GameController::updatePieces);
     m_eventSystem->connect(this, &GameController::onPieceFallen);
     m_eventSystem->connect(this, &GameController::onGameOver);
+    m_eventSystem->connect(this, &GameController::onLevelUp);
 }
 
 GameController::~GameController() {
@@ -84,7 +106,12 @@ void GameController::onPieceFallen(PieceFallenEvent *) {
     }
 }
 
-
+void GameController::onLevelUp(LevelUpEvent *) {
+    if (settings->getValue("Animation")) {
+        m_levelUpAnim->getComponent<AnimationComponent>().setCurrentFrame(0);
+        m_levelUpAnim->activate();
+    }
+}
 
 void GameController::KeyDown(Window &window, const KeyEvent &event) noexcept {
     now = ::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::system_clock::now().time_since_epoch());
@@ -237,6 +264,9 @@ void GameController::update(float deltaTime) {
         updateGhostPiece();
         m_gridSystem->update(deltaTime);
         m_scoreSystem->update(deltaTime);
+        if (true) {
+            m_animationSystem->update(deltaTime);
+        }
     }
 }
 
