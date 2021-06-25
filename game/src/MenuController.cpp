@@ -32,6 +32,10 @@ void MenuController::update(float) {
         bool _animation = settings->getValue("Animation");
         bool _ghostPiece = settings->getValue("Ghost piece");
         int themeIndex = settings->getValue("Theme");
+        float _pieceColor[4] = {settings->getValue("Block set color")[0],
+                                settings->getValue("Block set color")[1],
+                                settings->getValue("Block set color")[2],
+                                settings->getValue("Block set color")[3]};
 
         switch (currentPage) {
             case Menu::NewGame:
@@ -46,14 +50,15 @@ void MenuController::update(float) {
                 ::ImGui::Begin("Settings", NULL,
                                ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
-                ::ImGui::Checkbox("Ghost piece", &_ghostPiece);
-                ::ImGui::Checkbox("Animation", &_animation);
                 ::ImGui::Combo("Theme", &themeIndex, themes, IM_ARRAYSIZE(themes));
+                ::ImGui::Checkbox("Animation", &_animation);
+                ::ImGui::Checkbox("Ghost piece", &_ghostPiece);
+                ::ImGui::ColorEdit4("Piece set color", (float*)&_pieceColor);
 
                 settings->setValue("Theme", themeIndex);
                 settings->setValue("Ghost piece", _ghostPiece);
                 settings->setValue("Animation", _animation);
-
+                settings->setValue("Block set color", {_pieceColor[0], _pieceColor[1], _pieceColor[2], _pieceColor[3]});
                 ::ImGui::End();
                 break;
             case Menu::Quit:

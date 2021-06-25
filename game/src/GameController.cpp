@@ -113,6 +113,7 @@ void GameController::KeyDown(Window &window, const KeyEvent &event) noexcept {
             case MiniKit::Platform::Keycode::KeyQ:
                 if (m_currentState == State::GameOver) {
                     m_currentState = State::Off;
+                    m_gameOverLabel->deactivate();
                 }
                 m_parent->ChangeState();
                 break;
@@ -148,29 +149,34 @@ void GameController::updatePieces(SpawnPieceEvent *) {
     updateNextPiece();
 }
 
-uint8_t translateIndex(int index) {
-    switch (index) {
-        case 0:
-            return 73;
-        case 1:
-            return 79;
-        case 2:
-            return 74;
-        case 3:
-            return 76;
-        case 4:
-            return 84;
-        case 5:
-            return 90;
-        case 6:
-            return 83;
+uint8_t translateIndex(float frequency) {
+    if (settings->getValue("Tetrominos")["T"].at(2)["Frequency"] >= frequency) {
+        return 'T';
+    }
+    if (settings->getValue("Tetrominos")["L"].at(2)["Frequency"] >= frequency) {
+        return 'L';
+    }
+    if (settings->getValue("Tetrominos")["J"].at(2)["Frequency"] >= frequency) {
+        return 'J';
+    }
+    if (settings->getValue("Tetrominos")["Z"].at(2)["Frequency"] >= frequency) {
+        return 'Z';
+    }
+    if (settings->getValue("Tetrominos")["S"].at(2)["Frequency"] >= frequency) {
+        return 'S';
+    }
+    if (settings->getValue("Tetrominos")["O"].at(2)["Frequency"] >= frequency) {
+        return 'O';
+    }
+    if (settings->getValue("Tetrominos")["I"].at(2)["Frequency"] >= frequency) {
+        return 'I';
     }
 }
 
 void GameController::updateNextPiece() {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> distribution(0, 6);
+    std::uniform_real_distribution<float> distribution(0.05f, 0.7f);
 
     auto shape = static_cast<PieceComponent::Shape>(translateIndex(distribution(gen)));
 
@@ -222,7 +228,7 @@ void GameController::spawnPiece() {
 }
 
 void GameController::update(float deltaTime) {
-    if (m_currentState != State::Pause || m_currentState != State::GameOver) {
+    if (m_currentState != State::Pause && m_currentState != State::GameOver) {
         m_pieceSystem->update(deltaTime);
         m_collisionSystem->update(deltaTime);
         if (m_currentState == State::GameOver) {

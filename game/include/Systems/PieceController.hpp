@@ -3,6 +3,7 @@
 #include <EntityComponentSystem.hpp>
 #include <Components/PieceComponent.hpp>
 #include <Components/MoveComponent.hpp>
+#include <GameController.hpp>
 
 using ::Engine::ECS::System;
 using ::Engine::ECS::Requires;
@@ -13,7 +14,9 @@ class MoveComponent;
 
 class PieceController : public System<Requires<PieceComponent, MoveComponent>>, public ::MiniKit::Platform::Responder {
 public:
-    explicit PieceController(GameController *parent = nullptr) : m_parent(parent) {};
+    explicit PieceController(GameController *parent = nullptr) : m_parent(parent) {
+        m_parent->m_eventSystem->connect(this, &PieceController::onBlockSet);
+    };
 
     void update(float deltaTime);
 
@@ -28,11 +31,14 @@ public:
     void KeyDown(::MiniKit::Platform::Window &window, const ::MiniKit::Platform::KeyEvent &event) noexcept override;
     void KeyUp(::MiniKit::Platform::Window &window, const ::MiniKit::Platform::KeyEvent &event) noexcept override;
 
+    void onBlockSet(SpawnPieceEvent *);
+
 private:
     GameController *m_parent = { nullptr };
 
     float localTime = 0.f;
     float moveTime = 0.f;
+
 
 };
 

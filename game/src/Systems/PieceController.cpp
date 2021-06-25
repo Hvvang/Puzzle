@@ -50,6 +50,12 @@ void PieceController::update(float deltaTime) {
 }
 
 
+void PieceController::onBlockSet(SpawnPieceEvent *) {
+    auto &piece = m_parent->m_currentPiece->getComponent<PieceComponent>();
+    json _json_color = settings->getValue("Block set color");
+
+    setColor(piece, {_json_color.at(0), _json_color.at(1), _json_color.at(2), _json_color.at(3)});
+}
 
 void PieceController::setColor(PieceComponent &piece, const Color &color) {
     for (auto i = 0u; i < 4; ++i) {
@@ -69,9 +75,7 @@ void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape sh
     }
 
     json _json_color = settings->getValue("Tetrominos")[::std::string(1, static_cast<char>(shape))].at(1)["Color"];
-    Color color = {_json_color.at(0), _json_color.at(1), _json_color.at(2), _json_color.at(3)};
-
-    setColor(piece, color);
+    setColor(piece, {_json_color.at(0), _json_color.at(1), _json_color.at(2), _json_color.at(3)});
 }
 
 void PieceController::spawnGhost(PieceComponent &piece, const ::std::array<Vector2i, 4> &location) {
