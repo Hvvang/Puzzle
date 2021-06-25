@@ -40,6 +40,7 @@ class GameController : public Responder  {
         Fall,
         ClearLine,
         PieceBlocking,
+        GameOver,
         Pause,
         Off
     } m_currentState{State::Off};
@@ -51,7 +52,7 @@ public:
     void update(float deltaTime);
 
     void initPlayFieldBackground();
-    void updatePieces(BlockSetEvent *event = nullptr);
+    void updatePieces(SpawnPieceEvent *event = nullptr);
 
     void activate();
     void deactivate();
@@ -77,6 +78,7 @@ private:
     ::std::chrono::milliseconds m_pieceBlockingTimer{0};
 
     ::std::unique_ptr<Entity> m_pauseLabel{ nullptr };
+    ::std::unique_ptr<Entity> m_gameOverLabel{ nullptr };
     ::std::unique_ptr<Entity> m_controlInfoLabel{ nullptr };
     ::std::unique_ptr<Entity> m_playField{ nullptr };
     ::std::unique_ptr<Entity> m_currentPiece{ nullptr };

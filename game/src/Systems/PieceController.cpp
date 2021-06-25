@@ -50,6 +50,7 @@ void PieceController::update(float deltaTime) {
 }
 
 
+
 void PieceController::setColor(PieceComponent &piece, const Color &color) {
     for (auto i = 0u; i < 4; ++i) {
         m_parent->m_tileSystem->updateColor(piece.tiles[i]->getComponent<TileComponent>(), color);

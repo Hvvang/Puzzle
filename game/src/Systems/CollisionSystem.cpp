@@ -46,7 +46,7 @@ void CollisionSystem::update(float) {
 //            m_parent->m_eventSystem->emit(new GameOverEvent());
 //        }
     }
-    m_parent->updateGhostPiece();
+
 }
 
 bool CollisionSystem::checkOffset(const PieceComponent &piece, const PieceCollisionComponent &collision,

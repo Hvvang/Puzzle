@@ -9,10 +9,28 @@ using ::Engine::Math::IntRect;
 
 
 void TileController::update(float deltaTime) {
+//    auto entities = getEntities();
+//    for (auto &entity : entities) {
+//        auto &tile = entity.getComponent<TileComponent>();
+//
+//    }
+}
+
+void TileController::deactivate() {
     auto entities = getEntities();
     for (auto &entity : entities) {
         auto &tile = entity.getComponent<TileComponent>();
 
+        tile.instance->deactivate();
+    }
+}
+
+void TileController::activate() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &tile = entity.getComponent<TileComponent>();
+
+        tile.instance->activate();
     }
 }
 
@@ -52,6 +70,16 @@ void TileController::activate(TileComponent &tile) {
 
 void TileController::deactivate(TileComponent &tile) {
     tile.instance->deactivate();
+}
+
+void TileController::deleteTiles() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &tile = entity.getComponent<TileComponent>();
+
+        tile.instance->erase();
+        entity.erase();
+    }
 }
 
 

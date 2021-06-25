@@ -3,6 +3,7 @@
 #include <Event/Event.hpp>
 
 struct BlockSetEvent : Event {};
+struct SpawnPieceEvent : Event {};
 
 struct SoftDropEvent : Event {};
 struct HardDropEvent : Event {
