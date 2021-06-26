@@ -71,16 +71,21 @@ GameController::GameController(App *parent, MiniKit::Engine::Context &context) :
     m_ghostPiece->addComponent<PieceComponent>();
     m_nextPiece->addComponent<PieceComponent>();
 
+    auto &spriteAnimComponent = m_levelUpAnim->addComponent<Sprite>();
+    spriteAnimComponent.getTransform().position = {620, 351};
+    spriteAnimComponent.getTransform().scale = {0.2f, 0.2f};
+    spriteAnimComponent.setColor({0.9f, 0.5f, 0.f, 1.f});
+
     auto &lvlAnim = m_levelUpAnim->addComponent<AnimationComponent>();
-    lvlAnim.addFrame("levelUp0");
-    lvlAnim.addFrame("levelUp1");
-    lvlAnim.addFrame("levelUp2");
-    lvlAnim.addFrame("levelUp3");
+    auto lvlAnimTransform = Transformable::Transform({{}, {620, 351}, {0.2f, 0.2f}});
+    auto lvlAnimColor = Color{0.9f, 0.5f, 0.f, 1.f};
+    lvlAnim.isLoop = true;
+    lvlAnim.addFrame("levelUp0", lvlAnimTransform, lvlAnimColor);
+    lvlAnim.addFrame("levelUp1", lvlAnimTransform, lvlAnimColor);
+    lvlAnim.addFrame("levelUp2", lvlAnimTransform, lvlAnimColor);
+    lvlAnim.addFrame("levelUp3", lvlAnimTransform, lvlAnimColor);
     lvlAnim.animTime = ::std::chrono::milliseconds{2400};
     lvlAnim.frameDuration = ::std::chrono::milliseconds{300};
-    lvlAnim.getTransform().position = {640, 351};
-    lvlAnim.getTransform().scale *= 0.2f;
-    lvlAnim.getColor() = {0.9f, 0.5f, 0.f, 1.f};
 
     m_eventSystem->connect(this, &GameController::updatePieces);
     m_eventSystem->connect(this, &GameController::onPieceFallen);
@@ -97,8 +102,11 @@ void GameController::onPieceFallen(PieceFallenEvent *) {
     if (m_currentState != State::PieceBlocking) {
         m_currentState = State::PieceBlocking;
         m_pieceBlockingTimer = ::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::system_clock::now().time_since_epoch());
+        m_pieceSystem->onPieceFallen();
+
     } else {
         auto currentTime = ::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::system_clock::now().time_since_epoch());
+
         if (currentTime - m_pieceBlockingTimer > std::chrono::milliseconds(500)) {
             m_currentState = State::Fall;
             m_eventSystem->emit(new BlockSetEvent);
@@ -108,8 +116,8 @@ void GameController::onPieceFallen(PieceFallenEvent *) {
 
 void GameController::onLevelUp(LevelUpEvent *) {
     if (settings->getValue("Animation")) {
-        m_levelUpAnim->getComponent<AnimationComponent>().setCurrentFrame(0);
         m_levelUpAnim->activate();
+        m_levelUpAnim->getComponent<AnimationComponent>().state = AnimationComponent::Start;
     }
 }
 
@@ -264,26 +272,25 @@ void GameController::update(float deltaTime) {
         updateGhostPiece();
         m_gridSystem->update(deltaTime);
         m_scoreSystem->update(deltaTime);
-        if (true) {
+        if (settings->getValue("Animation"))
             m_animationSystem->update(deltaTime);
-        }
     }
 }
 
 
 void GameController::activate() {
-    m_currentState = State::Fall;
     m_context.GetWindow().AddResponder(*this);
     m_context.GetWindow().AddResponder(*m_pieceSystem);
 
     m_playField->activate();
     initPlayFieldBackground();
-
     m_nextPiece->activate();
 
     entityManager->refresh();
     m_gridSystem->activate();
     m_scoreSystem->activate();
+
+    m_currentState = State::Fall;
 }
 
 void GameController::deactivate() {
@@ -294,11 +301,6 @@ void GameController::deactivate() {
     m_currentPiece->deactivate();
     m_nextPiece->deactivate();
     m_ghostPiece->deactivate();
-
-//    m_playField->getComponent<ScoreComponent>().deactivate();
-//    m_currentPiece->getComponent<PieceComponent>().deactivate();
-//    m_nextPiece->getComponent<PieceComponent>().deactivate();
-//    m_ghostPiece->getComponent<PieceComponent>().deactivate();
 
     m_gridSystem->deactivate();
     m_scoreSystem->deactivate();

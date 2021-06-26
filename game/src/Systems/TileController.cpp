@@ -20,8 +20,10 @@ void TileController::deactivate() {
     auto entities = getEntities();
     for (auto &entity : entities) {
         auto &tile = entity.getComponent<TileComponent>();
-
-        tile.instance->deactivate();
+        if (entity.isActivated())
+            entity.deactivate();
+        if (tile.instance->isActivated())
+            tile.instance->deactivate();
     }
 }
 

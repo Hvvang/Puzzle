@@ -32,12 +32,14 @@ public:
     void KeyUp(::MiniKit::Platform::Window &window, const ::MiniKit::Platform::KeyEvent &event) noexcept override;
 
     void onBlockSet(SpawnPieceEvent *);
+    void onPieceFallen();
 
 private:
     GameController *m_parent = { nullptr };
 
     float localTime = 0.f;
     float moveTime = 0.f;
+
 
 
 };

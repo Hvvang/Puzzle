@@ -4,6 +4,8 @@
 
 #include <EntityManager.hpp>
 #include <Components/Sprite.hpp>
+#include <Components/AnimationComponent.hpp>
+#include <Event/GameEvents.hpp>
 
 using ::Engine::ECS::Entity;
 using ::Engine::ECS::Component;
@@ -20,11 +22,14 @@ struct TileComponent : Component {
         instance = ::std::make_unique<Entity>(entityManager->createEntity());
 
         auto &spriteComponent = instance->addComponent<Sprite>();
+        auto &animComponent = instance->addComponent<AnimationComponent>();
 
         spriteComponent.setImage("square");
         spriteComponent.getColor() = color;
         spriteComponent.getTransform().scale = {TileX * 2.f / static_cast<float>(spriteComponent.getTileRect().size.x),
                                                 TileY * 2.f / static_cast<float>(spriteComponent.getTileRect().size.y)};
+
+
     }
 
 private:

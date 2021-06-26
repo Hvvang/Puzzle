@@ -5,6 +5,7 @@
 #include <GameController.hpp>
 
 #include <Components/MoveComponent.hpp>
+#include <Components/ScoreComponent.hpp>
 
 #include <Settings.hpp>
 
@@ -13,6 +14,9 @@ using ::Engine::Math::operator-;
 void PieceController::update(float deltaTime) {
     localTime += deltaTime;
     moveTime += deltaTime;
+
+    auto level = m_parent->m_playField->getComponent<ScoreComponent>().lvl - 1;
+    auto time = ::std::pow(0.8f - (level * 0.007), level);
 
     auto entities = getEntities();
     for (auto &entity : entities) {
@@ -39,7 +43,7 @@ void PieceController::update(float deltaTime) {
             rotatePiece(pieceComponent, moveComponent, moveComponent.state & MoveComponent::RotateRight);
             moveTime = 0;
         }
-        else if (localTime > 0.6) {
+        else if (localTime > time) {
             moveComponent.previousData.state = static_cast<MoveComponent::State>(moveComponent.previousData.state |
                                                                                  MoveComponent::State::MoveDown);
             moveComponent.state = static_cast<MoveComponent::State>(MoveComponent::State::MoveDown);
@@ -49,6 +53,23 @@ void PieceController::update(float deltaTime) {
     }
 }
 
+void PieceController::onPieceFallen() {
+    auto &piece = m_parent->m_currentPiece->getComponent<PieceComponent>();
+
+    for (auto &tile : piece.tiles) {
+        auto &tileComponent = tile->getComponent<TileComponent>();
+        auto &animComponent = tileComponent.instance->getComponent<AnimationComponent>();
+        auto &spriteComponent = tileComponent.instance->getComponent<Sprite>();
+
+        auto blinkColor = spriteComponent.getColor();
+        blinkColor.alpha = 0.3f;
+        animComponent.addFrame("square", spriteComponent.getTransform(), blinkColor);
+        animComponent.addFrame("square", spriteComponent.getTransform(), spriteComponent.getColor());
+        animComponent.animTime = ::std::chrono::milliseconds{500};
+        animComponent.frameDuration = ::std::chrono::milliseconds{125};
+        animComponent.state = AnimationComponent::Start;
+    }
+}
 
 void PieceController::onBlockSet(SpawnPieceEvent *) {
     auto &piece = m_parent->m_currentPiece->getComponent<PieceComponent>();

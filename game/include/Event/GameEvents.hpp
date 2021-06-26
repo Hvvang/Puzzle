@@ -2,6 +2,7 @@
 
 #include <Event/Event.hpp>
 
+struct PieceFallenEvent : Event{};
 struct BlockSetEvent : Event {};
 struct SpawnPieceEvent : Event {};
 
@@ -11,7 +12,7 @@ struct HardDropEvent : Event {
 
     uint8_t _distance{0};
 };
-struct SoftDropCollidedEvent : Event {};
+
 struct LinesClearEvent : Event {
     LinesClearEvent(::std::vector<int> data) : _lines(data) {}
 
@@ -19,5 +20,4 @@ struct LinesClearEvent : Event {
 };
 
 struct LevelUpEvent : Event{};
-struct PieceFallenEvent : Event{};
 struct GameOverEvent : Event{};

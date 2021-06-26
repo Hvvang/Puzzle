@@ -63,6 +63,7 @@ public:
 
     uint8_t getHardDropDistance();
 
+
 private:
     void spawnPiece();
     void updateNextPiece();
