@@ -119,10 +119,16 @@ void GridController::onBlockSetEvent(BlockSetEvent *) {
 
     for (auto &tile : piece.tiles) {
         auto &component = tile->getComponent<TileComponent>();
+
+        if (component.position.y < 0 || !m_parent->m_gridSystem->isPosEmpty(component.position)) {
+            m_parent->m_eventSystem->emit(new GameOverEvent());
+            return;
+        }
         occupyPos(component.position, &component);
     }
     checkLinesToClear();
     clearLines();
+    m_parent->m_eventSystem->emit(new SpawnPieceEvent());
 }
 
 void GridController::resetBoard() {

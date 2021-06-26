@@ -4,7 +4,9 @@ add_definitions(-DDEBUG)
 
 set(Puzzle_SOURCES
         src/App.cpp
+        src/Settings.cpp
 
+        src/Systems/AnimationSystem.cpp
         src/Systems/GridController.cpp
         src/Systems/TileController.cpp
         src/Systems/PieceController.cpp
@@ -21,15 +23,17 @@ set(Puzzle_SOURCES
 
 set(Puzzle_HEADERS
         include/App.hpp
+        include/Settings.hpp
 
+        include/Components/AnimationComponent.hpp
         include/Components/PieceComponent.hpp
-
         include/Components/ScoreComponent.hpp
         include/Components/TileComponent.hpp
         include/Components/BoardComponent.hpp
         include/Components/MoveComponent.hpp
         include/Components/PieceCollisionComponent.hpp
 
+        include/Systems/AnimationSystem.hpp
         include/Systems/GridController.hpp
         include/Systems/PieceController.hpp
         include/Systems/TileController.hpp
@@ -52,9 +56,7 @@ set(Puzzle_HEADERS
 
         include/Utils/Button.hpp
 
-        include/StateMachines/StateMachine.hpp
-
-        src/Settings.cpp include/Settings.hpp)
+        )
 
 
 add_executable(${PROJECT_NAME}

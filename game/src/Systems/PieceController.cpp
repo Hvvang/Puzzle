@@ -5,6 +5,7 @@
 #include <GameController.hpp>
 
 #include <Components/MoveComponent.hpp>
+#include <Components/ScoreComponent.hpp>
 
 #include <Settings.hpp>
 
@@ -13,6 +14,9 @@ using ::Engine::Math::operator-;
 void PieceController::update(float deltaTime) {
     localTime += deltaTime;
     moveTime += deltaTime;
+
+    auto level = m_parent->m_playField->getComponent<ScoreComponent>().lvl - 1;
+    auto time = ::std::pow(0.8f - (level * 0.007), level);
 
     auto entities = getEntities();
     for (auto &entity : entities) {
@@ -23,20 +27,23 @@ void PieceController::update(float deltaTime) {
         moveComponent.previousData.rotationIndex = moveComponent.rotationIndex;
 
         if (moveTime > 0.2 && moveComponent.state &
-            (MoveComponent::State::MoveLeft | MoveComponent::State::MoveRight | MoveComponent::State::SoftDownMove)) {
+            (MoveComponent::State::MoveLeft | MoveComponent::State::MoveRight
+            | MoveComponent::State::SoftDownMove | MoveComponent::State::HardDownMove)) {
             moveComponent.previousData.state = moveComponent.state;
             movePiece(pieceComponent, moveComponent.direction[moveComponent.state]);
             moveTime = 0;
             if (moveComponent.state & MoveComponent::State::SoftDownMove) {
                 m_parent->m_eventSystem->emit(new SoftDropEvent());
             } else if (moveComponent.state & MoveComponent::State::HardDownMove) {
-                m_parent->m_eventSystem->emit(new SoftDropEvent());
+                auto offset = m_parent->getHardDropDistance();
+                movePiece(pieceComponent, {0, offset});
+                m_parent->m_eventSystem->emit(new HardDropEvent(offset));
             }
         } else if (moveTime > 0.2 && moveComponent.state & (MoveComponent::State::RotateLeft | MoveComponent::RotateRight)) {
             rotatePiece(pieceComponent, moveComponent, moveComponent.state & MoveComponent::RotateRight);
             moveTime = 0;
         }
-        else if (localTime > 0.6) {
+        else if (localTime > time) {
             moveComponent.previousData.state = static_cast<MoveComponent::State>(moveComponent.previousData.state |
                                                                                  MoveComponent::State::MoveDown);
             moveComponent.state = static_cast<MoveComponent::State>(MoveComponent::State::MoveDown);
@@ -46,10 +53,32 @@ void PieceController::update(float deltaTime) {
     }
 }
 
-void PieceController::setColor(PieceComponent &piece, PieceComponent::Shape shape) {
-    json _json_color = settings->getValue("Tetrominos")[::std::string(1, static_cast<char>(shape))].at(1)["Color"];
-    Color color = {_json_color.at(0), _json_color.at(1), _json_color.at(2), _json_color.at(3)};
+void PieceController::onPieceFallen() {
+    auto &piece = m_parent->m_currentPiece->getComponent<PieceComponent>();
 
+    for (auto &tile : piece.tiles) {
+        auto &tileComponent = tile->getComponent<TileComponent>();
+        auto &animComponent = tileComponent.instance->getComponent<AnimationComponent>();
+        auto &spriteComponent = tileComponent.instance->getComponent<Sprite>();
+
+        auto blinkColor = spriteComponent.getColor();
+        blinkColor.alpha = 0.3f;
+        animComponent.addFrame("square", spriteComponent.getTransform(), blinkColor);
+        animComponent.addFrame("square", spriteComponent.getTransform(), spriteComponent.getColor());
+        animComponent.animTime = ::std::chrono::milliseconds{500};
+        animComponent.frameDuration = ::std::chrono::milliseconds{125};
+        animComponent.state = AnimationComponent::Start;
+    }
+}
+
+void PieceController::onBlockSet(SpawnPieceEvent *) {
+    auto &piece = m_parent->m_currentPiece->getComponent<PieceComponent>();
+    json _json_color = settings->getValue("Block set color");
+
+    setColor(piece, {_json_color.at(0), _json_color.at(1), _json_color.at(2), _json_color.at(3)});
+}
+
+void PieceController::setColor(PieceComponent &piece, const Color &color) {
     for (auto i = 0u; i < 4; ++i) {
         m_parent->m_tileSystem->updateColor(piece.tiles[i]->getComponent<TileComponent>(), color);
     }
@@ -65,7 +94,19 @@ void PieceController::spawnPiece(PieceComponent &piece, PieceComponent::Shape sh
         int y = _json_shape.at(i).at(1);
         tileSystem->updatePosition(piece.tiles[i]->getComponent<TileComponent>(), spawnLocation + Vector2i({x, y}), boardOffset);
     }
-    setColor(piece, shape);
+
+    json _json_color = settings->getValue("Tetrominos")[::std::string(1, static_cast<char>(shape))].at(1)["Color"];
+    setColor(piece, {_json_color.at(0), _json_color.at(1), _json_color.at(2), _json_color.at(3)});
+}
+
+void PieceController::spawnGhost(PieceComponent &piece, const ::std::array<Vector2i, 4> &location) {
+    auto &tileSystem = m_parent->m_tileSystem;
+    for (unsigned i = 0; i < 4; ++i) {
+        tileSystem->updatePosition(piece.tiles[i]->getComponent<TileComponent>(), location[i], {5.f, 4.f});
+    }
+    json _json_color = settings->getValue("Ghost color");
+    Color color = {_json_color.at(0), _json_color.at(1), _json_color.at(2), _json_color.at(3)};
+    setColor(piece, color);
 }
 
 ::std::array<Vector2i, 4> PieceController::getTilesPosition(const PieceComponent &piece) {
@@ -85,6 +126,7 @@ void PieceController::movePiece(PieceComponent &piece, const Vector2i &offset) {
 int Mod(int x, int m) {
     return (x % m + m) % m;
 }
+
 
 void PieceController::rotatePiece(PieceComponent &piece, MoveComponent &move, bool clockwise) {
 

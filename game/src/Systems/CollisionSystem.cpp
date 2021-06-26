@@ -39,11 +39,14 @@ void CollisionSystem::update(float) {
                 m_parent->m_pieceSystem->movePiece(piece, backOffset);
             } else {
                 m_parent->m_pieceSystem->movePiece(piece, {0, -1});
-                m_parent->m_eventSystem->emit(new SoftDropCollidedEvent());
-                m_parent->m_eventSystem->emit(new BlockSetEvent());
+                m_parent->m_eventSystem->emit(new PieceFallenEvent());
             }
         }
+//        if (!checkMovePiece(m_parent->m_pieceSystem->getTilesPosition(piece), {0, 1})) {
+//            m_parent->m_eventSystem->emit(new GameOverEvent());
+//        }
     }
+
 }
 
 bool CollisionSystem::checkOffset(const PieceComponent &piece, const PieceCollisionComponent &collision,

@@ -9,10 +9,30 @@ using ::Engine::Math::IntRect;
 
 
 void TileController::update(float deltaTime) {
+//    auto entities = getEntities();
+//    for (auto &entity : entities) {
+//        auto &tile = entity.getComponent<TileComponent>();
+//
+//    }
+}
+
+void TileController::deactivate() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &tile = entity.getComponent<TileComponent>();
+        if (entity.isActivated())
+            entity.deactivate();
+        if (tile.instance->isActivated())
+            tile.instance->deactivate();
+    }
+}
+
+void TileController::activate() {
     auto entities = getEntities();
     for (auto &entity : entities) {
         auto &tile = entity.getComponent<TileComponent>();
 
+        tile.instance->activate();
     }
 }
 
@@ -34,16 +54,16 @@ void TileController::updateColor(TileComponent &tile, const Color &color) {
 }
 
 void TileController::rotate(TileComponent &tile, const Vector2i &origin, bool clockwise) {
-        Vector2i relativePos = tile.position - origin;
-        IntRect rotMatrix = clockwise
-                            ? IntRect{ Vector2i{0, 1}, Vector2i{-1, 0} }
-                            : IntRect{ Vector2i{0, -1}, Vector2i{1, 0} };
-        int newXPos = (rotMatrix.x * relativePos.x) + (rotMatrix.width * relativePos.y);
-        int newYPos = (rotMatrix.y * relativePos.x) + (rotMatrix.height * relativePos.y);
-        Vector2i newPos = {newXPos, newYPos};
+    Vector2i relativePos = tile.position - origin;
+    IntRect rotMatrix = clockwise
+                        ? IntRect{ Vector2i{0, 1}, Vector2i{-1, 0} }
+                        : IntRect{ Vector2i{0, -1}, Vector2i{1, 0} };
+    int newXPos = (rotMatrix.x * relativePos.x) + (rotMatrix.width * relativePos.y);
+    int newYPos = (rotMatrix.y * relativePos.x) + (rotMatrix.height * relativePos.y);
+    Vector2i newPos = {newXPos, newYPos};
 
-        newPos += origin;
-        updatePosition(tile, newPos);
+    newPos += origin;
+    updatePosition(tile, newPos);
 }
 
 void TileController::activate(TileComponent &tile) {
@@ -52,6 +72,16 @@ void TileController::activate(TileComponent &tile) {
 
 void TileController::deactivate(TileComponent &tile) {
     tile.instance->deactivate();
+}
+
+void TileController::deleteTiles() {
+    auto entities = getEntities();
+    for (auto &entity : entities) {
+        auto &tile = entity.getComponent<TileComponent>();
+
+        tile.instance->erase();
+        entity.erase();
+    }
 }
 
 

@@ -50,4 +50,5 @@ private:
     friend class PieceController;
     friend class CollisionSystem;
     friend class GridController;
+    friend class GameController;
 };

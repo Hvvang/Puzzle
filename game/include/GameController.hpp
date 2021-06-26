@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <EntityComponentSystem.hpp>
 #include "Font/Font.hpp"
 #include <Math.hpp>
@@ -18,10 +17,10 @@ class CollisionSystem;
 class PieceController;
 class TileController;
 class ScoreSystem;
+class AnimationSystem;
 
 namespace Engine::ECS {
     class Entity;
-
 }
 
 namespace MiniKit::Engine {
@@ -39,9 +38,11 @@ class GameController : public Responder  {
         Spawn,
         Fall,
         ClearLine,
-        PieceBlock,
-        Pause
-    } m_currentState{State::Spawn};
+        PieceBlocking,
+        GameOver,
+        Pause,
+        Off
+    } m_currentState{State::Off};
 
 public:
     explicit GameController(App *parent, MiniKit::Engine::Context &context);
@@ -50,7 +51,7 @@ public:
     void update(float deltaTime);
 
     void initPlayFieldBackground();
-    void updatePieces(BlockSetEvent *event = nullptr);
+    void updatePieces(SpawnPieceEvent *event = nullptr);
 
     void activate();
     void deactivate();
@@ -58,9 +59,19 @@ public:
     void NewGameState();
     void ResumeGameState();
 
+    bool hasGame() { return m_currentState != State::Off; }
+
+    uint8_t getHardDropDistance();
+
+
 private:
     void spawnPiece();
     void updateNextPiece();
+    void updateGhostPiece();
+
+    void onPieceFallen(PieceFallenEvent *);
+    void onGameOver(GameOverEvent *);
+    void onLevelUp(LevelUpEvent *);
 
     void KeyDown(Window &window, const KeyEvent &event) noexcept override;
 
@@ -70,7 +81,12 @@ private:
 
     ::std::chrono::milliseconds now;
     ::std::chrono::milliseconds inputDelay{0};
+    ::std::chrono::milliseconds m_pieceBlockingTimer{0};
 
+    ::std::unique_ptr<Entity> m_levelUpAnim{ nullptr };
+    ::std::unique_ptr<Entity> m_pauseLabel{ nullptr };
+    ::std::unique_ptr<Entity> m_gameOverLabel{ nullptr };
+    ::std::unique_ptr<Entity> m_controlInfoLabel{ nullptr };
     ::std::unique_ptr<Entity> m_playField{ nullptr };
     ::std::unique_ptr<Entity> m_currentPiece{ nullptr };
     ::std::unique_ptr<Entity> m_nextPiece{ nullptr };
@@ -82,6 +98,8 @@ private:
     ::std::shared_ptr<PieceController> m_pieceSystem{ nullptr };
     ::std::shared_ptr<TileController> m_tileSystem{ nullptr };
     ::std::shared_ptr<ScoreSystem> m_scoreSystem{ nullptr };
+    ::std::shared_ptr<AnimationSystem> m_animationSystem{ nullptr };
+
 
     friend class GridController;
     friend class CollisionSystem;

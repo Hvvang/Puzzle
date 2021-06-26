@@ -26,6 +26,12 @@ public:
     void activate(TileComponent &tile);
     void deactivate(TileComponent &tile);
 
+    void activate();
+    void deactivate();
+
+    void deleteTiles();
+
+
 private:
     GameController *m_parent = { nullptr };
 

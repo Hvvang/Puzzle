@@ -34,5 +34,11 @@ private:
     GameController *m_parent = { nullptr };
     int m_clearLines{0};
 
+    void onHardDrop(HardDropEvent *e);
 };
+
+
+
+
+
 
